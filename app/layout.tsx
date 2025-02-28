@@ -20,8 +20,8 @@ const montserrat = Montserrat({
 });
 
 const theme = createTheme({
-  fontFamily: montserrat.variable,
-  // headings: { fontFamily: "Roboto Mono" },
+  fontFamily: "Roboto Mono",
+  headings: { fontFamily: "Roboto Mono" },
 });
 export default function RootLayout({
   children,
@@ -51,7 +51,7 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
         <ColorSchemeScript />
       </head>
-      <body className={` ${montserrat.variable} antialiased`}>
+      <body className={` ntialiased`}>
         <MantineProvider theme={theme}> {children}</MantineProvider>
       </body>
     </html>
