@@ -4,6 +4,7 @@ import {
   PutItemCommand,
   GetItemCommand,
   QueryCommand,
+  ScanCommand,
 } from "@aws-sdk/client-dynamodb";
 
 // Define the Song interface
@@ -18,7 +19,7 @@ export interface SongData {
   createdAt?: string;
   updatedAt?: string;
 }
-interface SongDataDynamo {
+export interface SongDataDynamo {
   id: { N: string };
   title: { S: string };
   englishTitle: { S: string };
@@ -26,8 +27,8 @@ interface SongDataDynamo {
   lyrics: { S: string };
   titleSearch: { S: string };
   lyricsSearch: { S: string };
-  createdAt: { S: string };
-  updateAt: { S: string };
+  createdAt?: { S: string };
+  updateAt?: { S: string };
 }
 // Define response types
 export interface AwsResponse<T> {
@@ -146,7 +147,7 @@ export const searchSongsByTitle = async (
     // This assumes you have a Global Secondary Index on the title attribute
     const command = new QueryCommand({
       TableName: SONGS_TABLE,
-      IndexName: "TitleIndex", // You'll need to create this GSI in DynamoDB
+      //  IndexName: "TitleIndex", // You'll need to create this GSI in DynamoDB
       KeyConditionExpression: "title =:title",
       ExpressionAttributeValues: {
         ":title": { S: title },
@@ -173,8 +174,61 @@ export const searchSongsByTitle = async (
   }
 };
 
+export async function searchSongsByTitleAndLyrics(
+  searchValue: string
+): Promise<AwsResponse<SongDataDynamo[]>> {
+  try {
+    const command = new ScanCommand({
+      TableName: SONGS_TABLE,
+      FilterExpression:
+        "contains(#titleSearch,:searchValue) OR contains(#lyricsSearch,:searchValue)",
+
+      ExpressionAttributeNames: {
+        "#titleSearch": "titleSearch",
+        "#lyricsSearch": "lyricsSearch",
+      },
+      ExpressionAttributeValues: {
+        ":searchValue": { S: searchValue },
+      },
+    });
+    const response = await client.send(command);
+    return {
+      success: true,
+      data: response.Items as unknown as SongDataDynamo[],
+    };
+  } catch (error: unknown) {
+    //console.log(error.message);
+    if (error instanceof Error) return { success: false, error: error.message };
+    else
+      return {
+        success: false,
+        error: "something went wrong. Try again later",
+      };
+  }
+}
+export const getAllSongs = async (): Promise<AwsResponse<SongDataDynamo[]>> => {
+  try {
+    const command = new ScanCommand({
+      TableName: SONGS_TABLE,
+    });
+    const response = await client.send(command);
+    return {
+      success: true,
+      data: response.Items as unknown as SongDataDynamo[],
+    };
+  } catch (error: unknown) {
+    //console.log(error.message);
+    if (error instanceof Error) return { success: false, error: error.message };
+    else
+      return {
+        success: false,
+        error: "something went wrong. Try again later",
+      };
+  }
+};
 export default {
   saveSong,
   getSongById,
   searchSongsByTitle,
+  searchSongsByTitleAndLyrics,
 };

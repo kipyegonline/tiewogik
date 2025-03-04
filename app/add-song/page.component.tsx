@@ -5,7 +5,6 @@ import {
   TextInput,
   Textarea,
   Button,
-  Box,
   Title,
   Paper,
   Group,
@@ -13,7 +12,7 @@ import {
   Notification,
 } from "@mantine/core";
 import { Check as IconCheck, X as IconX } from "lucide-react";
-import { saveSong, SongData } from "@/lib/aws";
+import { saveSong } from "@/lib/aws";
 
 // Define form values interface
 interface FormValues {
@@ -37,7 +36,7 @@ const SongLyricsForm: React.FC = () => {
   const [notification, setNotification] = useState<NotificationState | null>(
     null
   );
-  const [lyrics, setLyrics] = useState([]);
+  const [lyrics, setLyrics] = useState<string[]>([]);
 
   // Define the form with validation
   const form = useForm<FormValues>({
@@ -71,9 +70,11 @@ const SongLyricsForm: React.FC = () => {
       id: { N: values.id },
       title: { S: values.title },
       englishTitle: { S: values.englishTitle },
+      chorus: { S: values.chorus },
       lyrics: { S: JSON.stringify(valz) },
       titleSearch: { S: values.title.toLowerCase() },
       lyricsSearch: { S: values.lyrics.toLowerCase() },
+      chorusSearch: { S: values.chorus.toLowerCase() },
     };
     try {
       // Send the form data to DynamoDB using our AWS library
@@ -97,13 +98,15 @@ const SongLyricsForm: React.FC = () => {
           message: result.error || "Failed to save song. Please try again.",
         });
       }
-    } catch (error: any) {
-      // Handle any unexpected errors
-      setNotification({
-        type: "error",
-        message:
-          error.message || "An unexpected error occurred. Please try again.",
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        // Handle any unexpected errors
+        setNotification({
+          type: "error",
+          message:
+            error.message || "An unexpected error occurred. Please try again.",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }

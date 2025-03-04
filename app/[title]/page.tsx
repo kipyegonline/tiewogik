@@ -1,12 +1,17 @@
+import { getAllSongs, SongDataDynamo } from "@/lib/aws";
+import { Box } from "@mantine/core";
 // Return a list of `params` to populate the [slug] dynamic segment
 export async function generateStaticParams() {
-  const posts = await fetch("https://.../posts").then((res) => res.json());
-
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
+  const response = await getAllSongs();
+  if (response.success && response.data !== undefined) {
+    return response.data.map((post: SongDataDynamo) => ({
+      id: post.title.S,
+    }));
+  }
+  return [];
 }
 export async function generateMetadata({ params }) {
+  console.log(params);
   /* const song = await fetchSong(params.id)
     
     return {
@@ -25,6 +30,7 @@ export default async function Page({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  const { title } = await params;
   // ...
+  return <Box>Something, {JSON.stringify(params)}</Box>;
 }

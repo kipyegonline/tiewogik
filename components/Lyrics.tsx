@@ -2,41 +2,27 @@
 
 import { useEffect, useState } from "react";
 import {
-  TextInput,
   ActionIcon,
-  Button,
   Container,
   Paper,
   Text,
   Title,
   Group,
   Transition,
-  Box,
   Notification,
-  Textarea,
 } from "@mantine/core";
 import { useClipboard } from "@mantine/hooks";
-import { Search, Copy, Share2 as Share, Check } from "lucide-react";
+import { Copy, Share2 as Share, Check } from "lucide-react";
 import { payload, Payload } from "@/data/payload";
 
 export default function LyricsSearchPage() {
-  const [search, setSearch] = useState("");
   const [lyrics, setLyrics] = useState<Payload | null>(null);
   const [showNotification, setShowNotification] = useState(false);
-  const [songs, setSongs] = useState<null | string[]>(null);
+
   const clipboard = useClipboard({ timeout: 2000 });
   useEffect(() => {
     setLyrics(payload[payload.length - 1]);
   }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, you'd fetch lyrics from an API here
-    if (search.trim()) {
-      alert(search);
-      setLyrics(payload[payload.length - 1]);
-    }
-  };
 
   const getLyricsText = () => {
     if (!lyrics) return "";
@@ -63,34 +49,13 @@ export default function LyricsSearchPage() {
       setTimeout(() => setShowNotification(false), 5000);
     }
   };
+  const browserSupport = `Your browser doesn\'t support the Web Share API.`;
 
   return (
     <Container
       size="md"
       className=" flex flex-col py-10 border-red max-w-[600px]"
     >
-      {/* Search Form - Google-like search bar */}
-      <form onSubmit={handleSearch} className="mb-8">
-        <TextInput
-          size="xl"
-          radius="md"
-          rightSection={
-            <ActionIcon variant="transparent" color="gray" type="submit">
-              <Search size={32} />
-            </ActionIcon>
-          }
-          placeholder="Search for song lyrics..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full"
-          /* rightSection={
-            <Button type="submit" variant="filled" color="blue">
-              Search
-            </Button>
-          }*/
-        />
-      </form>
-
       {/* Lyrics Display */}
       {lyrics && (
         <Paper
@@ -164,33 +129,10 @@ export default function LyricsSearchPage() {
             onClose={() => setShowNotification(false)}
             className="fixed bottom-4 right-4"
           >
-            Your browser doesn\'t support the Web Share API.
+            {browserSupport}
           </Notification>
         )}
       </Transition>
-
-      {songs?.length}
-      <Textarea
-        onBlur={(e) => {
-          const val = e.target.value;
-          const verses = val
-            .split("br")
-            .map((verse) => verse.replace("\n\n", ""));
-          console.log(verses);
-          setTimeout(() => setSongs([...new Set(verses)]), 5000);
-          setSongs(verses);
-          setLyrics({
-            id: 10,
-            title: "Testing songs....",
-            englishTitle: "",
-            chorus: [],
-            verses: verses,
-          });
-        }}
-        className="hidden md:block"
-        cols={100}
-        rows={8}
-      />
     </Container>
   );
 }
