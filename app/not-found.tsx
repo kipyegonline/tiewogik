@@ -42,10 +42,10 @@ export default function NotFound() {
           </Text>
         </div>
 
-        <Group position="center" spacing="md">
+        <Group>
           <Link href="/" passHref>
             <Button
-              leftIcon={<IconHome size={18} />}
+              leftSection={<IconHome size={18} />}
               variant="filled"
               color="blue"
               size="md"
@@ -54,9 +54,9 @@ export default function NotFound() {
             </Button>
           </Link>
 
-          <Link href="/search" passHref>
+          <Link href="/" passHref>
             <Button
-              leftIcon={<IconSearch size={18} />}
+              leftSection={<IconSearch size={18} />}
               variant="outline"
               color="blue"
               size="md"

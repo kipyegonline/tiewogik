@@ -226,9 +226,3 @@ export const getAllSongs = async (): Promise<AwsResponse<SongDataDynamo[]>> => {
       };
   }
 };
-export default {
-  saveSong,
-  getSongById,
-  searchSongsByTitle,
-  searchSongsByTitleAndLyrics,
-};

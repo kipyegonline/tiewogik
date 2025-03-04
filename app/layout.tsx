@@ -1,23 +1,11 @@
 "use client";
 import { ColorSchemeScript } from "@mantine/core";
 import { createTheme, MantineProvider } from "@mantine/core";
-import {
-  Geist,
-  Geist_Mono,
-  Noto_Serif_Georgian as Georgia,
-  Montserrat,
-  Poppins,
-} from "next/font/google";
+
 import "typeface-roboto-mono";
 import "./globals.css";
 
 import "@mantine/core/styles.css";
-
-const montserrat = Montserrat({
-  weight: ["400", "500"],
-  subsets: ["latin"],
-  variable: "--font-montserrat",
-});
 
 const theme = createTheme({
   fontFamily: "Roboto Mono",

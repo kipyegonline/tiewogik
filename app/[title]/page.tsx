@@ -1,3 +1,4 @@
+import { PageProps } from "@/.next/types/app/layout";
 import { getAllSongs, SongDataDynamo } from "@/lib/aws";
 import { Box } from "@mantine/core";
 // Return a list of `params` to populate the [slug] dynamic segment
@@ -10,7 +11,10 @@ export async function generateStaticParams() {
   }
   return [];
 }
-export async function generateMetadata({ params }) {
+/*Promise<{ title: string; description: string; openGraph: { images: { url: string }[] } }>*/
+
+// Return the dynamic route params to render this page
+export async function generateMetadata({ params }: PageProps) {
   console.log(params);
   /* const song = await fetchSong(params.id)
     
@@ -30,7 +34,6 @@ export default async function Page({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { title } = await params;
   // ...
   return <Box>Something, {JSON.stringify(params)}</Box>;
 }
