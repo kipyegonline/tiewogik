@@ -15,6 +15,7 @@ import {
 import { useClipboard } from "@mantine/hooks";
 import { SongDataDynamo } from "@/lib/aws";
 import { Copy, Share2 as Share, Check } from "lucide-react";
+import { track } from "@vercel/analytics";
 type Props = { lyrics: SongDataDynamo; ChorusComponent: () => React.ReactNode };
 export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
   const [showNotification, setShowNotification] = React.useState(false);
@@ -45,6 +46,7 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
           text: getLyricsText(),
           url: window.location.href,
         });
+        track("share_lyrics", { song: lyrics.title.S });
       } catch (error) {
         console.error("Error sharing:", error);
       }
@@ -52,6 +54,10 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 5000);
     }
+  };
+  const handleCopy = () => {
+    clipboard.copy(getLyricsText());
+    track("copy_lyrics", { song: lyrics.title.S });
   };
   const EnglishTitle = (
     <Text color="dimmed" className="mb-6">
@@ -72,11 +78,11 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
 
       {lyrics.englishTitle.S && EnglishTitle}
       <div
-        className="lyrics-container rounded-lg p-4 space-y-4"
+        className="lyrics-container rounded-lg p-2 md:p-4 space-y-4"
         style={{ background: "beige" }}
       >
         {verses.map((part: string, i: number) => (
-          <Box key={i} className=" px-4 " inert>
+          <Box key={i} className=" px-2 md:px-4 " inert>
             <small className="text-gray-400  ">[{i + 1}]</small>
             <div>
               <Text
@@ -98,7 +104,7 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
               variant="light"
               color={clipboard.copied ? "green" : "blue"}
               size="lg"
-              onClick={() => clipboard.copy(getLyricsText())}
+              onClick={handleCopy}
             >
               {clipboard.copied ? <Check size={20} /> : <Copy size={20} />}
             </ActionIcon>

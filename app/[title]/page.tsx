@@ -1,7 +1,7 @@
 import { PageProps } from "@/.next/types/app/layout";
 
 import { getAllSongs, SongDataDynamo, getSongById } from "@/lib/aws";
-import { Box, Breadcrumbs, Container } from "@mantine/core";
+import { Breadcrumbs, Container } from "@mantine/core";
 import PageComponent from "./page.component";
 import Link from "next/link";
 import { Home } from "lucide-react";
@@ -34,7 +34,9 @@ export async function generateStaticParams() {
 // Return the dynamic route params to render this page
 export async function generateMetadata({ params }: PageProps) {
   const ps = await params;
-  const id = extractSongId(ps.title);
+  let id!: string;
+  if ("title" in ps) id = extractSongId(ps.title);
+  else id = "0";
 
   const song = await getSongById(id);
 
@@ -42,11 +44,11 @@ export async function generateMetadata({ params }: PageProps) {
     return makeSEOExpression(song.data);
   } else {
     return {
-      title: ` Kalenjin Hymn song ${ps.slice(
+      title: ` Kalenjin Hymn song ${ps?.title?.slice(
         1,
         -1
       )} } |   Tienwogik che kilosune Jehovah | Tienwogik ab Kalosunet `,
-      description: `Lyrics for Kalenjin hymn song,   | Tienwogik che kilosune Jehovah | Tienwogik ab Kalosunet   ${ps.slice(
+      description: `Lyrics for Kalenjin hymn song,   | Tienwogik che kilosune Jehovah | Tienwogik ab Kalosunet   ${ps?.title?.slice(
         1,
         -1
       )}`,
@@ -65,6 +67,20 @@ export default async function Page({
   let song: null | SongDataDynamo = null;
   const { title } = await params;
   const id = extractSongId(title);
+  if (Number.isNaN(Number(id)))
+    return (
+      <Container p="lg" size={"lg"}>
+        <Breadcrumbs>
+          <Link href="/" className="text-blue-500 flex items-center">
+            <Home className="inline-block mr-2" />
+            <span>Home</span>
+          </Link>
+          <Link href="/" inert>
+            Song not found
+          </Link>
+        </Breadcrumbs>
+      </Container>
+    );
   const response = await getSongById(id);
   if (response.success && response.data !== undefined) {
     song = response.data;
@@ -84,5 +100,5 @@ export default async function Page({
         <PageComponent song={song} />
       </Container>
     );
-  return <Box>Something....</Box>;
+  return null;
 }

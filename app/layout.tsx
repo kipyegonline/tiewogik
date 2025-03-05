@@ -1,7 +1,7 @@
 "use client";
 import { ColorSchemeScript } from "@mantine/core";
 import { createTheme, MantineProvider } from "@mantine/core";
-
+import { Analytics } from "@vercel/analytics/react";
 import "typeface-roboto-mono";
 import "./globals.css";
 
@@ -40,7 +40,11 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body className={` ntialiased`}>
-        <MantineProvider theme={theme}> {children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          {" "}
+          {children}
+          <Analytics />
+        </MantineProvider>
       </body>
     </html>
   );

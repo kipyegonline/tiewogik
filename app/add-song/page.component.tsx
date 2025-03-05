@@ -10,8 +10,11 @@ import {
   Group,
   Select,
   Notification,
+  Breadcrumbs,
 } from "@mantine/core";
-import { Check as IconCheck, X as IconX } from "lucide-react";
+import Link from "next/link";
+
+import { Check as IconCheck, X as IconX, Home } from "lucide-react";
 import { saveSong } from "@/lib/aws";
 
 // Define form values interface
@@ -37,6 +40,7 @@ const SongLyricsForm: React.FC = () => {
     null
   );
   const [lyrics, setLyrics] = useState<string[]>([]);
+  const [loggedin, setloggedin] = useState<boolean>(false);
 
   // Define the form with validation
   const form = useForm<FormValues>({
@@ -60,6 +64,11 @@ const SongLyricsForm: React.FC = () => {
         value.trim().length > 0 ? null : "Chorus is required",*/
     },
   });
+  React.useEffect(() => {
+    const password = prompt("Enter OTP");
+    if (password === "tiendo") setloggedin(true);
+    else setloggedin(false);
+  }, []);
 
   const handleSubmit = async (values: FormValues): Promise<void> => {
     setIsSubmitting(true);
@@ -108,34 +117,26 @@ const SongLyricsForm: React.FC = () => {
         });
       }
     } finally {
+      setTimeout(() => setNotification(null), 3000);
       setIsSubmitting(false);
     }
   };
-
+  if (!loggedin) return null;
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+      <Breadcrumbs py="md">
+        <Link href="/" className="text-blue-500 flex items-center">
+          <Home className="inline-block mr-2" />
+          <span>Home</span>
+        </Link>
+        <Link href="/" inert>
+          Add song
+        </Link>
+      </Breadcrumbs>
       <Paper shadow="md" p="lg" className="w-full max-w-3xl bg-white">
         <Title order={2} className="text-center mb-6 text-gray-800">
           Song Lyrics Submission
         </Title>
-
-        {notification && (
-          <Notification
-            icon={
-              notification.type === "success" ? (
-                <IconCheck size="1.1rem" />
-              ) : (
-                <IconX size="1.1rem" />
-              )
-            }
-            color={notification.type === "success" ? "teal" : "red"}
-            title={notification.type === "success" ? "Success" : "Error"}
-            className="mb-4"
-            onClose={() => setNotification(null)}
-          >
-            {notification.message}
-          </Notification>
-        )}
 
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <div className="space-y-4">
@@ -214,6 +215,23 @@ const SongLyricsForm: React.FC = () => {
               {...form.getInputProps("lyrics")}
             />
           </div>
+          {notification && (
+            <Notification
+              icon={
+                notification.type === "success" ? (
+                  <IconCheck size="1.1rem" />
+                ) : (
+                  <IconX size="1.1rem" />
+                )
+              }
+              color={notification.type === "success" ? "teal" : "red"}
+              title={notification.type === "success" ? "Success" : "Error"}
+              className="mb-4"
+              onClose={() => setNotification(null)}
+            >
+              {notification.message}
+            </Notification>
+          )}
 
           <Group mt="xl">
             <Button

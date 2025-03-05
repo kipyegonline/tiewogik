@@ -13,7 +13,7 @@ export default function SearchComponent({ sendValue }: Props) {
   };
 
   return (
-    <form onSubmit={handleSearch} className="mb-8  max-w-2xl">
+    <form onSubmit={handleSearch} className="mb-8  max-w-2xl relative top-4">
       <TextInput
         size="lg"
         radius="md"
