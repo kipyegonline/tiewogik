@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
   Paper,
@@ -9,6 +10,7 @@ import {
   Transition,
   Notification,
   Flex,
+  Tooltip,
 } from "@mantine/core";
 import { useClipboard } from "@mantine/hooks";
 import { SongDataDynamo } from "@/lib/aws";
@@ -51,27 +53,30 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
       setTimeout(() => setShowNotification(false), 5000);
     }
   };
+  const EnglishTitle = (
+    <Text color="dimmed" className="mb-6">
+      {lyrics.englishTitle.S}
+    </Text>
+  );
   return (
     <Paper
       shadow="sm"
-      p="md"
-      className="mb-8 flex-grow overflow-auto max-w-md mx-auto"
+      px="md"
+      className="mb-8  flex-grow overflow-auto max-w-md mx-auto"
     >
-      <Title order={3} className="mb-2">
+      <Title order={3} className="mb-2 text-center" pb="sm">
         {lyrics.id.N}
         {"  "}
         {lyrics.title.S}
       </Title>
-      <Text color="dimmed" className="mb-6">
-        {lyrics.englishTitle.S}
-      </Text>
 
+      {lyrics.englishTitle.S && EnglishTitle}
       <div
         className="lyrics-container rounded-lg p-4 space-y-4"
         style={{ background: "beige" }}
       >
         {verses.map((part: string, i: number) => (
-          <Box key={i} className="border-red-500 border border-red " inert>
+          <Box key={i} className=" px-4 " inert>
             <small className="text-gray-400  ">[{i + 1}]</small>
             <div>
               <Text
@@ -86,25 +91,28 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
         ))}
       </div>
       {/* Action Buttons */}
-      <Flex justify={"flex-end"} mt="md">
+      <Flex justify={"center"} mt="md" p="sm" gap="md">
         <Group>
-          <ActionIcon
-            variant="light"
-            color={clipboard.copied ? "green" : "blue"}
-            size="lg"
-            onClick={() => clipboard.copy(getLyricsText())}
-          >
-            {clipboard.copied ? <Check size={20} /> : <Copy size={20} />}
-          </ActionIcon>
-
-          <ActionIcon
-            variant="light"
-            color="blue"
-            size="lg"
-            onClick={handleShare}
-          >
-            <Share size={20} />
-          </ActionIcon>
+          <Tooltip label="copy song lyrics">
+            <ActionIcon
+              variant="light"
+              color={clipboard.copied ? "green" : "blue"}
+              size="lg"
+              onClick={() => clipboard.copy(getLyricsText())}
+            >
+              {clipboard.copied ? <Check size={20} /> : <Copy size={20} />}
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Share song lyrics">
+            <ActionIcon
+              variant="light"
+              color="blue"
+              size="lg"
+              onClick={handleShare}
+            >
+              <Share size={20} />
+            </ActionIcon>
+          </Tooltip>
         </Group>
       </Flex>
 

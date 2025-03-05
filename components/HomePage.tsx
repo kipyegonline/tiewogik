@@ -16,6 +16,7 @@ import ChorusComponent from "./ChorusComponent";
 import { SongDataDynamo } from "@/lib/aws";
 import { getSongById, searchSongsByTitleAndLyrics } from "@/lib/aws";
 import { useRouter } from "next/navigation";
+import { AudioLines } from "lucide-react";
 
 export default function HomePage() {
   const [loading, setloading] = React.useState(false);
@@ -39,26 +40,37 @@ export default function HomePage() {
           else setSong(result?.data[0]);
         }
       } else setError(result.error !== undefined ? result.error : null);
-      console.log(result);
     } else {
       const result = await getSongById(value);
       if (result.success && result.data !== undefined) setSong(result?.data);
       else setError(result.error !== undefined ? result.error : null);
-      console.log(result);
     }
     setloading(false);
   };
   const router = useRouter();
   const ListSongs = (
     <Box>
-      <Text>{songs.length} songs found</Text>
-      <List className="border-red">
+      <Text className="!text-lg py-2 font-semibold">
+        {songs.length} songs found
+      </Text>
+      <List className="border-red " p="md" size="lg" withPadding spacing={"lg"}>
         {songs.map((song) => (
           <ListItem
             onClick={() =>
-              router.push(`/${song.title.S.split(" ").join("-")}-${song.id.N}`)
+              router.push(
+                `/${song.title.S.toLowerCase().split(" ").join("-")}-${
+                  song.id.N
+                }`
+              )
             }
             key={song.id.N}
+            icon={
+              <AudioLines
+                size={24}
+                className="inline-block mr-1 text-amber-800"
+              />
+            }
+            className="cursor-pointer"
           >
             {song.id.N}
             {"  "}
