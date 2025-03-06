@@ -6,7 +6,6 @@ import {
   Text,
   Box,
   Group,
-  ActionIcon,
   Transition,
   Notification,
   Flex,
@@ -19,8 +18,9 @@ import { track } from "@vercel/analytics";
 type Props = { lyrics: SongDataDynamo; ChorusComponent: () => React.ReactNode };
 export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
   const [showNotification, setShowNotification] = React.useState(false);
+  const [copied, setCopied] = React.useState("Copy song lyrics");
   let verses = [];
-  const clipboard = useClipboard({ timeout: 2000 });
+  const clipboard = useClipboard({ timeout: 3000 });
   try {
     verses = JSON.parse(lyrics.lyrics.S);
   } catch (error) {
@@ -58,9 +58,11 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
   const handleCopy = () => {
     clipboard.copy(getLyricsText());
     track("copy_lyrics", { song: lyrics.title.S });
+    setCopied("Copied!");
+    setTimeout(() => setCopied("Copy song lyrics"), 3000);
   };
   const EnglishTitle = (
-    <Text color="dimmed" className="mb-6">
+    <Text color="dimmed" pb="md" className="mb-6 !text-purple-600 text-center">
       {lyrics.englishTitle.S}
     </Text>
   );
@@ -70,7 +72,7 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
       px="md"
       className="mb-8  flex-grow overflow-auto max-w-md mx-auto"
     >
-      <Title order={3} className="mb-2 text-center" pb="sm">
+      <Title order={3} className="mb-2 text-left md:text-center" pb="sm">
         {lyrics.id.N}
         {"  "}
         {lyrics.title.S}
@@ -78,7 +80,7 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
 
       {lyrics.englishTitle.S && EnglishTitle}
       <div
-        className="lyrics-container rounded-lg p-2 md:p-4 space-y-4"
+        className="lyrics-container rounded-lg p-2 md:p-4 space-y-4 min-w-full md:min-w-[400px]"
         style={{ background: "beige" }}
       >
         {verses.map((part: string, i: number) => (
@@ -97,27 +99,31 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
         ))}
       </div>
       {/* Action Buttons */}
-      <Flex justify={"center"} mt="md" p="sm" gap="md">
+      <Flex justify={"space-around"} mt="md" p="sm" gap="md">
         <Group>
-          <Tooltip label="copy song lyrics">
-            <ActionIcon
-              variant="light"
+          <Tooltip label={copied} className="text-white bg-primary">
+            <button
               color={clipboard.copied ? "green" : "blue"}
-              size="lg"
+              //   size="lg"
+              style={{ color: clipboard.copied ? "green" : "emerald" }}
+              className="flex items-center space-x-2"
               onClick={handleCopy}
             >
-              {clipboard.copied ? <Check size={20} /> : <Copy size={20} />}
-            </ActionIcon>
+              {clipboard.copied ? <Check size={20} /> : <Copy size={20} />}{" "}
+              <span>{copied.includes("Copied") ? "Copied" : "Copy"}</span>
+            </button>
           </Tooltip>
           <Tooltip label="Share song lyrics">
-            <ActionIcon
-              variant="light"
+            <button
+              // variant="light"
               color="blue"
-              size="lg"
+              className="flex items-center space-x-2"
+              // size="lg"
               onClick={handleShare}
             >
               <Share size={20} />
-            </ActionIcon>
+              <span>Share</span>
+            </button>
           </Tooltip>
         </Group>
       </Flex>

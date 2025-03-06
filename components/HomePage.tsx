@@ -24,26 +24,41 @@ export default function HomePage() {
   const [song, setSong] = React.useState<null | SongDataDynamo>(null);
   const [songs, setSongs] = React.useState<SongDataDynamo[]>([]);
   const [error, setError] = React.useState<string | null>(null);
-
-  const handleSearch = async (value: string) => {
-    //reset everything
+  const [notFound, setNofound] = React.useState<null | string>(null);
+  const resetValues = () => {
     setSong(null);
     setSongs([]);
     setloading(true);
     setError(null);
+    setNofound(null);
+  };
+
+  const handleSearch = async (value: string) => {
+    //reset everything
+    resetValues();
     // if they duidn't enter song number
     if (Number.isNaN(Number(value))) {
       const result = await searchSongsByTitleAndLyrics(value);
+
       if (result?.success) {
         if (result.data !== undefined) {
           if (result?.data?.length > 1) setSongs(result?.data);
           else setSong(result?.data[0]);
+        } else {
+          setNofound("No songs found");
         }
       } else setError(result.error !== undefined ? result.error : null);
     } else {
       const result = await getSongById(value);
-      if (result.success && result.data !== undefined) setSong(result?.data);
-      else setError(result.error !== undefined ? result.error : null);
+      console.log(result);
+      if (result.success) {
+        if (result.data !== undefined) setSong(result?.data);
+        else setNofound("Song lyrics not found,Check  keyword and try again.");
+      } else {
+        setError(result.error !== undefined ? result.error : null);
+      }
+      /*  && result.data !== undefined) setSong(result?.data);
+      else setError(result.error !== undefined ? result.error : null);*/
     }
     setloading(false);
   };
@@ -81,7 +96,7 @@ export default function HomePage() {
     </Box>
   );
   return (
-    <Box className="border-red w-full">
+    <Box className=" w-full">
       <Box className="mx-auto max-w-xl">
         {" "}
         <SearchComponent sendValue={handleSearch} />
@@ -96,14 +111,24 @@ export default function HomePage() {
         {songs.length > 1 && <Box py="md">{ListSongs}</Box>}
         <Box>
           {loading && (
-            <Center>
-              <Loader />
+            <Center className="py-8 md:py-16">
+              <Box>
+                <Loader type="dots" size="xl" />
+                <p>Muiten kidogo</p>
+              </Box>
             </Center>
           )}
           {error && (
             <Box py="md">
               <Alert variant="light" color="red">
                 {error}
+              </Alert>
+            </Box>
+          )}
+          {notFound && (
+            <Box py="md">
+              <Alert variant="light" color="red">
+                {notFound}
               </Alert>
             </Box>
           )}

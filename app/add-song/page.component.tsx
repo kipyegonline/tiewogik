@@ -198,6 +198,7 @@ const SongLyricsForm: React.FC = () => {
               label="Chorus"
               placeholder="Enter the chorus of the song"
               minRows={3}
+              rows={5}
               className="w-full"
               {...form.getInputProps("chorus")}
             />
