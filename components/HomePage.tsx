@@ -16,7 +16,8 @@ import ChorusComponent from "./ChorusComponent";
 import { SongDataDynamo } from "@/lib/aws";
 import { getSongById, searchSongsByTitleAndLyrics } from "@/lib/aws";
 import { useRouter } from "next/navigation";
-import { AudioLines } from "lucide-react";
+import { AudioLines, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 export default function HomePage() {
   const [loading, setloading] = React.useState(false);
@@ -62,7 +63,7 @@ export default function HomePage() {
     }
     setloading(false);
   };
-  const router = useRouter();
+
   const ListSongs = (
     <Box>
       <Text className="!text-lg py-2 font-semibold">
@@ -71,13 +72,7 @@ export default function HomePage() {
       <List className="border-red " p="md" size="lg" withPadding spacing={"lg"}>
         {songs.map((song) => (
           <ListItem
-            onClick={() =>
-              router.push(
-                `/${song.title.S.toLowerCase().split(" ").join("-")}-${
-                  song.id.N
-                }`
-              )
-            }
+            onClick={() => setSong(song)}
             key={song.id.N}
             icon={
               <AudioLines
@@ -90,6 +85,18 @@ export default function HomePage() {
             {song.id.N}
             {"  "}
             {song.title.S}
+            <Link
+              href={`/${song.title.S.toLowerCase().split(" ").join("-")}-${
+                song.id.N
+              }`}
+              target="_blank"
+            >
+              <ExternalLink
+                size={18}
+                color="blue"
+                className="ml-2 inline-block"
+              />
+            </Link>
           </ListItem>
         ))}
       </List>

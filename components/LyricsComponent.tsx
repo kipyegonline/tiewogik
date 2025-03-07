@@ -66,6 +66,36 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
       {lyrics.englishTitle.S}
     </Text>
   );
+  const shareIcons = (
+    <Flex justify={"space-around"} mt="md" p="sm" gap="md">
+      <Group>
+        <Tooltip label={copied} className="text-white bg-primary">
+          <button
+            color={clipboard.copied ? "green" : "blue"}
+            //   size="lg"
+            style={{ color: clipboard.copied ? "green" : "emerald" }}
+            className="flex items-center space-x-2"
+            onClick={handleCopy}
+          >
+            {clipboard.copied ? <Check size={20} /> : <Copy size={20} />}{" "}
+            <span>{copied.includes("Copied") ? "Copied" : "Copy"}</span>
+          </button>
+        </Tooltip>
+        <Tooltip label="Share song lyrics">
+          <button
+            // variant="light"
+            color="blue"
+            className="flex items-center space-x-2 text-blue-600"
+            // size="lg"
+            onClick={handleShare}
+          >
+            <Share size={20} />
+            <span>Share</span>
+          </button>
+        </Tooltip>
+      </Group>
+    </Flex>
+  );
   return (
     <Paper
       shadow="sm"
@@ -79,6 +109,7 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
       </Title>
 
       {lyrics.englishTitle.S && EnglishTitle}
+      {shareIcons}
       <div
         className="lyrics-container rounded-lg p-2 md:p-4 space-y-4 min-w-full md:min-w-[400px]"
         style={{ background: "beige" }}
@@ -98,35 +129,7 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
           </Box>
         ))}
       </div>
-      {/* Action Buttons */}
-      <Flex justify={"space-around"} mt="md" p="sm" gap="md">
-        <Group>
-          <Tooltip label={copied} className="text-white bg-primary">
-            <button
-              color={clipboard.copied ? "green" : "blue"}
-              //   size="lg"
-              style={{ color: clipboard.copied ? "green" : "emerald" }}
-              className="flex items-center space-x-2"
-              onClick={handleCopy}
-            >
-              {clipboard.copied ? <Check size={20} /> : <Copy size={20} />}{" "}
-              <span>{copied.includes("Copied") ? "Copied" : "Copy"}</span>
-            </button>
-          </Tooltip>
-          <Tooltip label="Share song lyrics">
-            <button
-              // variant="light"
-              color="blue"
-              className="flex items-center space-x-2"
-              // size="lg"
-              onClick={handleShare}
-            >
-              <Share size={20} />
-              <span>Share</span>
-            </button>
-          </Tooltip>
-        </Group>
-      </Flex>
+      {shareIcons}
 
       {/* Notification when Web Share API is not available */}
       <Transition mounted={showNotification} transition="fade" duration={400}>
