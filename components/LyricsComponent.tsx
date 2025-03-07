@@ -15,6 +15,7 @@ import { useClipboard } from "@mantine/hooks";
 import { SongDataDynamo } from "@/lib/aws";
 import { Copy, Share2 as Share, Check } from "lucide-react";
 import { track } from "@vercel/analytics";
+import { colors } from "@/lib/Color";
 type Props = { lyrics: SongDataDynamo; ChorusComponent: () => React.ReactNode };
 export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
   const [showNotification, setShowNotification] = React.useState(false);
@@ -112,7 +113,7 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
       {shareIcons}
       <div
         className="lyrics-container rounded-lg p-2 md:p-4 space-y-4 min-w-full md:min-w-[400px]"
-        style={{ background: "beige" }}
+        style={{ background: colors.bg2 }}
       >
         {verses.map((part: string, i: number) => (
           <Box key={i} className=" px-2 md:px-4 " inert>

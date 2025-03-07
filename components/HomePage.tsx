@@ -18,6 +18,7 @@ import { getSongById, searchSongsByTitleAndLyrics } from "@/lib/aws";
 import { useRouter } from "next/navigation";
 import { AudioLines, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { colors } from "@/lib/Color";
 
 export default function HomePage() {
   const [loading, setloading] = React.useState(false);
@@ -103,7 +104,7 @@ export default function HomePage() {
     </Box>
   );
   return (
-    <Box className=" w-full">
+    <Box className=" w-full" style={{ background: colors.bg2 }}>
       <Box className="mx-auto max-w-xl">
         {" "}
         <SearchComponent sendValue={handleSearch} />
