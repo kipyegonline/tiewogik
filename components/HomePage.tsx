@@ -15,7 +15,6 @@ import LyricsComponent from "./LyricsComponent";
 import ChorusComponent from "./ChorusComponent";
 import { SongDataDynamo } from "@/lib/aws";
 import { getSongById, searchSongsByTitleAndLyrics } from "@/lib/aws";
-import { useRouter } from "next/navigation";
 import { AudioLines, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { colors } from "@/lib/Color";
