@@ -243,7 +243,7 @@ const SongLyricsForm: React.FC = () => {
             >
               Reset
             </Button>
-            <Button type="submit" color="blue" loading={isSubmitting}>
+            <Button type="submit" color="orange" loading={isSubmitting}>
               Save to Database
             </Button>
           </Group>

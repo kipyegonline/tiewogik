@@ -15,7 +15,8 @@ import { useClipboard } from "@mantine/hooks";
 import { SongDataDynamo } from "@/lib/aws";
 import { Copy, Share2 as Share, Check } from "lucide-react";
 import { track } from "@vercel/analytics";
-import { colors } from "@/lib/Color";
+//import { colors } from "@/lib/Color";
+
 type Props = { lyrics: SongDataDynamo; ChorusComponent: () => React.ReactNode };
 export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
   const [showNotification, setShowNotification] = React.useState(false);
@@ -29,7 +30,7 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
   }
   const getLyricsText = () => {
     if (!lyrics) return "";
-    const clipboardtext = `${lyrics.title.S} -\n${verses
+    const clipboardtext = `${lyrics.title.S}\n${verses
       .map(
         (verse: string, i: number) =>
           `[${i + 1}]\n${verse.replace("\n\n", "")} `
@@ -39,22 +40,27 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
     return clipboardtext;
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `${lyrics.title} Lyrics`,
-          text: getLyricsText(),
-          url: window.location.href,
-        });
-        track("share_lyrics", { song: lyrics.title.S });
-      } catch (error) {
-        console.error("Error sharing:", error);
+  const handleShare = (song: SongDataDynamo) => {
+    return async function () {
+      const url = `/${song.title.S.toLowerCase().split(" ").join("-")}-${
+        song.id.N
+      }`;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: `${lyrics.title} Lyrics`,
+            text: getLyricsText(),
+            url,
+          });
+          track("share_lyrics", { song: lyrics.title.S });
+        } catch (error) {
+          console.error("Error sharing:", error);
+        }
+      } else {
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 5000);
       }
-    } else {
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 5000);
-    }
+    };
   };
   const handleCopy = () => {
     clipboard.copy(getLyricsText());
@@ -70,25 +76,29 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
   const shareIcons = (
     <Flex justify={"space-around"} mt="md" p="sm" gap="md">
       <Group>
-        <Tooltip label={copied} className="text-white bg-primary">
+        <Tooltip
+          label={copied}
+          className="text-white bg-primary"
+          position="bottom"
+        >
           <button
             color={clipboard.copied ? "green" : "blue"}
             //   size="lg"
             style={{ color: clipboard.copied ? "green" : "emerald" }}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 text-gray-600 hover:bg-gray-100 transition-colors"
             onClick={handleCopy}
           >
             {clipboard.copied ? <Check size={20} /> : <Copy size={20} />}{" "}
             <span>{copied.includes("Copied") ? "Copied" : "Copy"}</span>
           </button>
         </Tooltip>
-        <Tooltip label="Share song lyrics">
+        <Tooltip label="Share song lyrics" position="bottom">
           <button
             // variant="light"
             color="blue"
             className="flex items-center space-x-2 text-blue-600"
             // size="lg"
-            onClick={handleShare}
+            onClick={handleShare(lyrics)}
           >
             <Share size={20} />
             <span>Share</span>
@@ -102,8 +112,13 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
       shadow="sm"
       px="md"
       className="mb-8  flex-grow overflow-auto max-w-md mx-auto"
+      //  className="bg-white p-6 rounded-lg shadow-sm border border-[#F9EBE0]"
     >
-      <Title order={3} className="mb-2 text-left md:text-center" pb="sm">
+      <Title
+        order={3}
+        className="mb-2 text-left md:text-center text-[#E86F36]"
+        pb="sm"
+      >
         {lyrics.id.N}
         {"  "}
         {lyrics.title.S}
@@ -112,8 +127,8 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
       {lyrics.englishTitle.S && EnglishTitle}
       {shareIcons}
       <div
-        className="lyrics-container rounded-lg p-2 md:p-4 space-y-4 min-w-full md:min-w-[400px]"
-        style={{ background: colors.bg2 }}
+        className="lyrics-container rounded-lg p-2 md:p-4 space-y-4 min-w-full md:min-w-[400px] border-[#F9EBE0]"
+        //   style={{ background: colors.bg2 }}
       >
         {verses.map((part: string, i: number) => (
           <Box key={i} className=" px-2 md:px-4 " inert>

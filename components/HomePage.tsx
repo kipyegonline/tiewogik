@@ -17,7 +17,6 @@ import { SongDataDynamo } from "@/lib/aws";
 import { getSongById, searchSongsByTitleAndLyrics } from "@/lib/aws";
 import { AudioLines, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { colors } from "@/lib/Color";
 
 export default function HomePage() {
   const [loading, setloading] = React.useState(false);
@@ -51,7 +50,7 @@ export default function HomePage() {
       } else setError(result.error !== undefined ? result.error : null);
     } else {
       const result = await getSongById(value);
-      console.log(result);
+
       if (result.success) {
         if (result.data !== undefined) setSong(result?.data);
         else setNofound("Song lyrics not found,Check  keyword and try again.");
@@ -66,7 +65,7 @@ export default function HomePage() {
 
   const ListSongs = (
     <Box>
-      <Text className="!text-lg py-2 font-semibold">
+      <Text className="!text-lg py-2 font-semibold text-[#E86F36]">
         {songs.length} songs found
       </Text>
       <List className="border-red " p="md" size="lg" withPadding spacing={"lg"}>
@@ -103,7 +102,7 @@ export default function HomePage() {
     </Box>
   );
   return (
-    <Box className=" w-full" style={{ background: colors.bg2 }}>
+    <Box className=" w-full ">
       <Box className="mx-auto max-w-xl">
         {" "}
         <SearchComponent sendValue={handleSearch} />
@@ -120,8 +119,13 @@ export default function HomePage() {
           {loading && (
             <Center className="py-8 md:py-16">
               <Box>
-                <Loader type="dots" size="xl" />
-                <p>Muiten kidogo</p>
+                <Loader
+                  type="dots"
+                  size="xl"
+                  className="!text-orange-500"
+                  color="orange"
+                />
+                <p>Muiten kidogo </p>
               </Box>
             </Center>
           )}
