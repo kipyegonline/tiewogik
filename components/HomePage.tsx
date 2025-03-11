@@ -11,12 +11,22 @@ import {
 } from "@mantine/core";
 import React from "react";
 import SearchComponent from "./SearchComponent";
-import LyricsComponent from "./LyricsComponent";
+
 import ChorusComponent from "./ChorusComponent";
 import { SongDataDynamo } from "@/lib/aws";
 import { getSongById, searchSongsByTitleAndLyrics } from "@/lib/aws";
 import { AudioLines, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import LyricsPagination from "./Lyricspagination";
+import LyricsComponent from "./LyricsComponent";
+
+type Checked = { clicked?: boolean };
+
+const addClickedAttr = (songs: SongDataDynamo[]) =>
+  songs.map((song: SongDataDynamo & Checked) => {
+    song.clicked = false;
+    return song;
+  });
 
 export default function HomePage() {
   const [loading, setloading] = React.useState(false);
@@ -25,6 +35,8 @@ export default function HomePage() {
   const [songs, setSongs] = React.useState<SongDataDynamo[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [notFound, setNofound] = React.useState<null | string>(null);
+  const [current, setCurrent] = React.useState(1);
+  const perPage = 20;
   const resetValues = () => {
     setSong(null);
     setSongs([]);
@@ -33,6 +45,15 @@ export default function HomePage() {
     setNofound(null);
   };
 
+  /*const initApp = async () => {
+    const randomSongId = Math.floor(Math.random() * 245);
+    const result = await getSongById(randomSongId + "");
+
+    if (result.success) {
+      if (result.data !== undefined) setSong(result?.data);
+    }
+  };*/
+  React.useEffect(() => {}, []);
   const handleSearch = async (value: string) => {
     //reset everything
     resetValues();
@@ -42,8 +63,10 @@ export default function HomePage() {
 
       if (result?.success) {
         if (result.data !== undefined) {
-          if (result?.data?.length > 1) setSongs(result?.data);
-          else setSong(result?.data[0]);
+          if (result?.data?.length > 1) {
+            const songs = addClickedAttr(result.data);
+            setSongs(songs);
+          } else setSong(result?.data[0]);
         } else {
           setNofound("No songs found");
         }
@@ -62,42 +85,59 @@ export default function HomePage() {
     }
     setloading(false);
   };
+  const handleClick = (song: SongDataDynamo) => {
+    setSong(song);
 
+    setSongs(
+      songs.map((s: SongDataDynamo & Checked) => {
+        if (s.id.N === song.id.N) {
+          s.clicked = true;
+        } else {
+          s.clicked = false;
+        }
+        return s;
+      })
+    );
+  };
   const ListSongs = (
     <Box>
       <Text className="!text-lg py-2 font-semibold text-[#E86F36]">
         {songs.length} songs found
       </Text>
       <List className="border-red " p="md" size="lg" withPadding spacing={"lg"}>
-        {songs.map((song) => (
-          <ListItem
-            onClick={() => setSong(song)}
-            key={song.id.N}
-            icon={
-              <AudioLines
-                size={24}
-                className="inline-block mr-1 text-amber-800"
-              />
-            }
-            className="cursor-pointer"
-          >
-            {song.id.N}
-            {"  "}
-            {song.title.S}
-            <Link
-              href={`/${song.title.S.toLowerCase().split(" ").join("-")}-${
-                song.id.N
+        {songs
+          .slice(current - 1, (current - 1) * perPage)
+          .map((song: SongDataDynamo & Checked, i: number) => (
+            <ListItem
+              onClick={() => handleClick(song)}
+              key={song.id.N}
+              icon={
+                <AudioLines
+                  size={24}
+                  className="inline-block mr-1 text-amber-800"
+                />
+              }
+              className={`cursor-pointer ${
+                song.clicked ? "text-[#E86F36]" : ""
               }`}
-              target="_blank"
             >
-              <ExternalLink
-                size={18}
-                color="blue"
-                className="ml-2 inline-block"
-              />
-            </Link>
-          </ListItem>
-        ))}
+              {song.id.N}
+              {"  "}
+              {song.title.S}==={current}
+              <Link
+                href={`/${song.title.S.toLowerCase().split(" ").join("-")}-${
+                  song.id.N
+                }`}
+                target="_blank"
+              >
+                <ExternalLink
+                  size={18}
+                  color="blue"
+                  className="ml-2 inline-block"
+                />
+              </Link>
+            </ListItem>
+          ))}
       </List>
     </Box>
   );
@@ -114,7 +154,16 @@ export default function HomePage() {
         // wrap="wrap"
       >
         {/*Show a listof songs jhere*/}
-        {songs.length > 1 && <Box py="md">{ListSongs}</Box>}
+        {songs.length > 1 && (
+          <Box py="md">
+            {ListSongs}
+            <LyricsPagination
+              total={Math.ceil(songs.length / perPage)}
+              current={current}
+              setCurrent={setCurrent}
+            />
+          </Box>
+        )}
         <Box>
           {loading && (
             <Center className="py-8 md:py-16">

@@ -111,7 +111,8 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
     <Paper
       shadow="sm"
       px="md"
-      className="mb-8  flex-grow overflow-auto max-w-md mx-auto"
+      radius="md"
+      className="mb-8 mt-8 flex-grow overflow-auto max-w-md mx-auto py-2"
       //  className="bg-white p-6 rounded-lg shadow-sm border border-[#F9EBE0]"
     >
       <Title
@@ -127,7 +128,7 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
       {lyrics.englishTitle.S && EnglishTitle}
       {shareIcons}
       <div
-        className="lyrics-container rounded-lg p-2 md:p-4 space-y-4 min-w-full md:min-w-[400px] border-[#F9EBE0]"
+        className="lyrics-container rounded-lg p-2 md:p-4 space-y-4 min-w-full md:min-w-[400px] border-2 border-gray-100"
         //   style={{ background: colors.bg2 }}
       >
         {verses.map((part: string, i: number) => (

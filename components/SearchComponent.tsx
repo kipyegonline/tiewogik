@@ -26,11 +26,6 @@ export default function SearchComponent({ sendValue }: Props) {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="w-full"
-        /* rightSection={
-               <Button type="submit" variant="filled" color="blue">
-                 Search
-               </Button>
-             }*/
       />
     </form>
   );

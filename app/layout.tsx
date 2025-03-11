@@ -56,31 +56,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-const Layout = ({ children }) => {
-  return (
-    <div className="flex flex-col min-h-screen bg-[#FFF9F2]">
-      {" "}
-      {/* Warm background for body */}
-      <Header />
-      <main className="flex-grow pt-16 px-4 md:px-6">{children}</main>
-      <Footer />
-    </div>
-  );
-};
-
-// And in your lyrics display component:
-const LyricsDisplay = ({ lyrics }) => {
-  return (
-    <div className="max-w-3xl mx-auto my-8">
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-[#F9EBE0]">
-        <h1 className="text-2xl font-bold mb-4 text-[#E86F36]">
-          {lyrics.title}
-        </h1>
-        <div className="lyrics-content whitespace-pre-line">
-          {lyrics.content}
-        </div>
-      </div>
-    </div>
-  );
-};
