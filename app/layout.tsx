@@ -41,13 +41,15 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
         <ColorSchemeScript />
       </head>
-      <body className={` antialiased min-h-full`}>
+      <body className={` antialiased min-h-screen`}>
         <MantineProvider theme={theme}>
           {" "}
-          <main className="flex flex-col min-h-screen">
+          <main className="flex flex-col !min-h-screen">
             <Header />
-            <div className="flex-grow pt-20 md:pt-20 "> {children}</div>
-
+            <div className="flex-grow pt-20 md:pt-20  min-h-screen">
+              {" "}
+              {children}
+            </div>
             <Footer />
           </main>
           <Analytics />

@@ -41,7 +41,7 @@ const Footer = () => {
 */
   return (
     <footer
-      className="w-full p-6 !text-white"
+      className="w-full p-6 !text-white mt-6 md:mt-20"
       style={{
         background: colors.brown.dark,
       }}
@@ -102,18 +102,18 @@ const Footer = () => {
           </div>
 
           {/* Made with love */}
-          <div className="flex items-center w-[360px]">
+          <div className="flex items-center w-[360px] md:w-[400px] ">
             <Text className="text-white font-medium flex items-center">
               Made with{" "}
               <Heart
                 className="mx-1 text-red-500 fill-red-500 inline-block"
                 size={18}
               />{" "}
-              by{"     "}
+              by{""}
               <a
                 href="https://vince-resume.vercel.app/"
-                target="_blank"
-                className="pl-2"
+                target="_blank "
+                className="pl-2 inline-block"
               >
                 Vince Kipyegon
               </a>
