@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, Button, Box, Textarea, Title, Flex, Image } from "@mantine/core";
+import { Text, Button, Box, Textarea, Flex, Image } from "@mantine/core";
 import { Heart, Coffee, AlertCircle } from "lucide-react";
 import { colors } from "@/lib/Color";
 import AppModal from "./AppModal";
@@ -9,9 +9,9 @@ const Footer = () => {
   const tea = ["Chebango", "Kapkatet", "Kericho Gold", "Litein", ""];
   const randTea = () => tea[Math.floor(Math.random() * tea.length)];
   const chosentea = React.useCallback(() => randTea(), [])();
-  let url = `https://formsubmit.co/ajax/vinnykipx@gmail.com`;
+  //const url = `https://formsubmit.co/ajax/vinnykipx@gmail.com`;
   const [open, setOpen] = React.useState<null | 1 | 2 | 3>(null);
-
+  /*
   async function submitFormToFormSubmit(
     formData: Record<string, string>,
     formSubmitEndpoint: string
@@ -38,7 +38,7 @@ const Footer = () => {
       return null;
     }
   }
-
+*/
   return (
     <footer
       className="w-full p-6 !text-white"

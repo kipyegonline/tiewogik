@@ -1,10 +1,9 @@
-import { PageProps } from "@/.next/types/app/layout";
-
 import { getAllSongs, SongDataDynamo, getSongById } from "@/lib/aws";
 import { Breadcrumbs, Container } from "@mantine/core";
 import PageComponent from "./page.component";
 import Link from "next/link";
 import { Home } from "lucide-react";
+import { PageProps } from "@/.next/types/app/page";
 const makeSEOExpression = (song: SongDataDynamo) => {
   const lyrics = eval(song.lyrics.S).join(" ");
   return {
@@ -32,6 +31,7 @@ export async function generateStaticParams() {
 /*Promise<{ title: string; description: string; openGraph: { images: { url: string }[] } }>*/
 
 // Return the dynamic route params to render this page
+
 export async function generateMetadata({ params }: PageProps) {
   const ps = await params;
   let id!: string;
