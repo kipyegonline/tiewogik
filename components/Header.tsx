@@ -41,7 +41,10 @@ const Header = () => {
         {/* Logo & Website Name - Desktop */}
         <Link href="/">
           <div className="flex items-center gap-2">
-            <Music size={32} className="text-orange-500 inline-block mr-2" />
+            <Music
+              size={32}
+              className="text-orange-500 inline-block mr-2 animate-pulse"
+            />
             <Text
               style={{ color: colors.brown.primary }}
               className=" !text-2xl !font-bold hidden sm:block"

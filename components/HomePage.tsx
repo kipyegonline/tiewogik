@@ -11,8 +11,6 @@ import {
 } from "@mantine/core";
 import React from "react";
 import SearchComponent from "./SearchComponent";
-
-import ChorusComponent from "./ChorusComponent";
 import { SongDataDynamo } from "@/lib/aws";
 import { getSongById, searchSongsByTitleAndLyrics } from "@/lib/aws";
 import { AudioLines, ExternalLink } from "lucide-react";
@@ -99,45 +97,47 @@ export default function HomePage() {
       })
     );
   };
+  const first = (current - 1) * perPage;
+  const last = first + perPage;
   const ListSongs = (
-    <Box>
+    <Box className="text-white">
       <Text className="!text-lg py-2 font-semibold text-[#E86F36]">
-        {songs.length} songs found
+        {songs.length} songs found.{" "}
+        {songs.length > 50 && (
+          <span>Also try using precise keywords to get better results</span>
+        )}
       </Text>
-      <List className="border-red " p="md" size="lg" withPadding spacing={"lg"}>
-        {songs
-          .slice(current - 1, (current - 1) * perPage)
-          .map((song: SongDataDynamo & Checked, i: number) => (
-            <ListItem
-              onClick={() => handleClick(song)}
-              key={song.id.N}
-              icon={
-                <AudioLines
-                  size={24}
-                  className="inline-block mr-1 text-amber-800"
-                />
-              }
-              className={`cursor-pointer ${
-                song.clicked ? "text-[#E86F36]" : ""
+      <List className="" p="md" size="lg" withPadding spacing={"lg"}>
+        {songs.slice(first, last).map((song: SongDataDynamo & Checked) => (
+          <ListItem
+            onClick={() => handleClick(song)}
+            key={song.id.N}
+            icon={
+              <AudioLines
+                size={24}
+                className="inline-block mr-1 text-amber-800"
+              />
+            }
+            className={`cursor-pointer ${song.clicked ? "text-[#E86F36]" : ""}`}
+          >
+            {song.id.N}
+            {"  "}
+            {song.title.S}
+            <Link
+              href={`/${song.title.S.toLowerCase().split(" ").join("-")}-${
+                song.id.N
               }`}
+              title="Open in new tab"
+              target="_blank"
             >
-              {song.id.N}
-              {"  "}
-              {song.title.S}==={current}
-              <Link
-                href={`/${song.title.S.toLowerCase().split(" ").join("-")}-${
-                  song.id.N
-                }`}
-                target="_blank"
-              >
-                <ExternalLink
-                  size={18}
-                  color="blue"
-                  className="ml-2 inline-block"
-                />
-              </Link>
-            </ListItem>
-          ))}
+              <ExternalLink
+                size={18}
+                color="blue"
+                className="ml-4 inline-block"
+              />
+            </Link>
+          </ListItem>
+        ))}
       </List>
     </Box>
   );
@@ -164,9 +164,9 @@ export default function HomePage() {
             />
           </Box>
         )}
-        <Box>
+        <Box className="-order-1 md:order-1">
           {loading && (
-            <Center className="py-8 md:py-16">
+            <Center className="py-8 md:py-16 bg-white p-4 min-w-[320px]">
               <Box>
                 <Loader
                   type="dots"
@@ -174,31 +174,26 @@ export default function HomePage() {
                   className="!text-orange-500"
                   color="orange"
                 />
-                <p>Muiten kidogo </p>
+                <h3>Muiten kidogo </h3>
               </Box>
             </Center>
           )}
           {error && (
             <Box py="md">
-              <Alert variant="light" color="red">
+              <Alert variant="light" color="red" className="!text-white">
                 {error}
               </Alert>
             </Box>
           )}
           {notFound && (
-            <Box py="md">
-              <Alert variant="light" color="red">
+            <Box py="md" c="white">
+              <Alert variant="light" color="red" className="!text-white">
                 {notFound}
               </Alert>
             </Box>
           )}
 
-          {song ? (
-            <LyricsComponent
-              lyrics={song}
-              ChorusComponent={() => <ChorusComponent />}
-            />
-          ) : null}
+          {song ? <LyricsComponent lyrics={song} /> : null}
         </Box>
       </Flex>
     </Box>

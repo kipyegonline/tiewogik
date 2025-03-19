@@ -16,8 +16,12 @@
 
 body {
   color: var(--foreground);
-  background: var(--background) !important;
+  /*background: var(--background) !important*/
   font-family: "Roboto Mono", Arial, Helvetica, sans-serif;
+  background-image: url("../public/lyrics-background.svg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 pre {

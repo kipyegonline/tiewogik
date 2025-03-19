@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E86F36" />
+      <stop offset="50%" stop-color="#F2956B" />
+      <stop offset="100%" stop-color="#F9B896" />
+    </linearGradient>
+    
+    <!-- Particle glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <!-- Lyrics icon -->
+    <symbol id="lyricsIcon" viewBox="0 0 100 100">
+      <path d="M20,20 L80,20 L80,70 Q80,80 70,80 L30,80 Q20,80 20,70 Z" fill="none" stroke="#FFF8F0" stroke-width="3" />
+      <line x1="30" y1="35" x2="70" y2="35" stroke="#FFF8F0" stroke-width="3" />
+      <line x1="30" y1="50" x2="60" y2="50" stroke="#FFF8F0" stroke-width="3" />
+      <line x1="30" y1="65" x2="50" y2="65" stroke="#FFF8F0" stroke-width="3" />
+      <circle cx="75" cy="85" r="10" fill="#FFF8F0" />
+      <path d="M75,85 L75,40" stroke="#FFF8F0" stroke-width="3" />
+    </symbol>
+  </defs>
+  
+  <!-- Main background -->
+  <rect width="100%" height="100%" fill="url(#bgGradient)" />
+  
+  <!-- Decorative elements (atom-like particles) -->
+  <g class="particles">
+    <!-- Orbits -->
+    <ellipse cx="200" cy="150" rx="60" ry="30" fill="none" stroke="#FFF8F0" stroke-width="1" opacity="0.3">
+      <animateTransform attributeName="transform" type="rotate" from="0 200 150" to="360 200 150" dur="15s" repeatCount="indefinite" />
+    </ellipse>
+    
+    <ellipse cx="800" cy="400" rx="80" ry="40" fill="none" stroke="#FFF8F0" stroke-width="1" opacity="0.3">
+      <animateTransform attributeName="transform" type="rotate" from="0 800 400" to="-360 800 400" dur="20s" repeatCount="indefinite" />
+    </ellipse>
+    
+    <ellipse cx="500" cy="300" rx="120" ry="70" fill="none" stroke="#FFF8F0" stroke-width="1" opacity="0.3">
+      <animateTransform attributeName="transform" type="rotate" from="0 500 300" to="360 500 300" dur="25s" repeatCount="indefinite" />
+    </ellipse>
+    
+    <!-- Floating particles -->
+    <circle cx="200" cy="150" r="12" fill="#FFF8F0" opacity="0.7" filter="url(#glow)">
+      <animate attributeName="opacity" values="0.5;0.8;0.5" dur="4s" repeatCount="indefinite" />
+    </circle>
+    
+    <circle cx="260" cy="150" r="8" fill="#FFF8F0" opacity="0.7" filter="url(#glow)">
+      <animateTransform attributeName="transform" type="rotate" from="0 200 150" to="360 200 150" dur="15s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.5;0.9;0.5" dur="3s" repeatCount="indefinite" />
+    </circle>
+    
+    <circle cx="800" cy="400" r="10" fill="#FFF8F0" opacity="0.7" filter="url(#glow)">
+      <animate attributeName="opacity" values="0.6;0.9;0.6" dur="5s" repeatCount="indefinite" />
+    </circle>
+    
+    <circle cx="880" cy="400" r="6" fill="#FFF8F0" opacity="0.7" filter="url(#glow)">
+      <animateTransform attributeName="transform" type="rotate" from="0 800 400" to="-360 800 400" dur="20s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.5;0.8;0.5" dur="4s" repeatCount="indefinite" />
+    </circle>
+    
+    <circle cx="500" cy="300" r="15" fill="#FFF8F0" opacity="0.7" filter="url(#glow)">
+      <animate attributeName="opacity" values="0.6;0.9;0.6" dur="6s" repeatCount="indefinite" />
+    </circle>
+    
+    <circle cx="620" cy="300" r="8" fill="#FFF8F0" opacity="0.7" filter="url(#glow)">
+      <animateTransform attributeName="transform" type="rotate" from="0 500 300" to="360 500 300" dur="25s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.5;0.8;0.5" dur="5s" repeatCount="indefinite" />
+    </circle>
+    
+    <!-- Additional floating particles -->
+    <circle cx="300" cy="500" r="10" fill="#FFF8F0" opacity="0.6" filter="url(#glow)">
+      <animate attributeName="cy" values="500;480;500" dur="8s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.4;0.7;0.4" dur="8s" repeatCount="indefinite" />
+    </circle>
+    
+    <circle cx="700" cy="100" r="12" fill="#FFF8F0" opacity="0.6" filter="url(#glow)">
+      <animate attributeName="cy" values="100;120;100" dur="10s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.4;0.7;0.4" dur="5s" repeatCount="indefinite" />
+    </circle>
+    
+    <circle cx="100" cy="300" r="8" fill="#FFF8F0" opacity="0.6" filter="url(#glow)">
+      <animate attributeName="cx" values="100;120;100" dur="12s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.4;0.7;0.4" dur="6s" repeatCount="indefinite" />
+    </circle>
+    
+    <circle cx="900" cy="200" r="10" fill="#FFF8F0" opacity="0.6" filter="url(#glow)">
+      <animate attributeName="cx" values="900;880;900" dur="15s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.4;0.7;0.4" dur="7s" repeatCount="indefinite" />
+    </circle>
+  </g>
+  
+  <!-- Floating lyrics icon -->
+  <use href="#lyricsIcon" x="450" y="250" width="100" height="100" opacity="0.35">
+    <animate attributeName="y" values="250;260;250" dur="8s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.25;0.45;0.25" dur="8s" repeatCount="indefinite" />
+  </use>
+  
+  <!-- Additional smaller lyrics icons -->
+  <use href="#lyricsIcon" x="150" y="100" width="50" height="50" opacity="0.2">
+    <animate attributeName="y" values="100;110;100" dur="10s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.15;0.25;0.15" dur="10s" repeatCount="indefinite" />
+  </use>
+  
+  <use href="#lyricsIcon" x="800" y="500" width="60" height="60" opacity="0.2">
+    <animate attributeName="y" values="500;510;500" dur="12s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.15;0.25;0.15" dur="12s" repeatCount="indefinite" />
+  </use>
+
+  <!-- Subtle connecting lines that appear and disappear -->
+  <line x1="200" y1="150" x2="500" y2="300" stroke="#FFF8F0" stroke-width="1" opacity="0.1">
+    <animate attributeName="opacity" values="0;0.15;0" dur="20s" repeatCount="indefinite" />
+  </line>
+  
+  <line x1="500" y1="300" x2="800" y2="400" stroke="#FFF8F0" stroke-width="1" opacity="0.1">
+    <animate attributeName="opacity" values="0;0.2;0" dur="15s" repeatCount="indefinite" />
+  </line>
+  
+  <line x1="300" y1="500" x2="500" y2="300" stroke="#FFF8F0" stroke-width="1" opacity="0.1">
+    <animate attributeName="opacity" values="0;0.15;0" dur="18s" repeatCount="indefinite" />
+  </line>
+</svg>

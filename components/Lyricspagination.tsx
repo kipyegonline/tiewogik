@@ -14,6 +14,8 @@ export default function LyricsPagination({
     <Box py="md">
       <Pagination
         total={total}
+        gap="lg"
+        size="lg"
         value={current}
         onChange={setCurrent}
         color="orange"

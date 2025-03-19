@@ -10,16 +10,21 @@ import {
   Notification,
   Flex,
   Tooltip,
+  Checkbox,
 } from "@mantine/core";
 import { useClipboard } from "@mantine/hooks";
 import { SongDataDynamo } from "@/lib/aws";
 import { Copy, Share2 as Share, Check } from "lucide-react";
 import { track } from "@vercel/analytics";
+import ChorusComponent from "./ChorusComponent";
 //import { colors } from "@/lib/Color";
 
-type Props = { lyrics: SongDataDynamo; ChorusComponent: () => React.ReactNode };
-export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
+type Props = { lyrics: SongDataDynamo };
+export default function LyricsComponent({ lyrics }: Props) {
   const [showNotification, setShowNotification] = React.useState(false);
+  const [showChorus, setShowChorus] = React.useState(false);
+  // const [asKverse, setVerse] = React.useState(false);
+  const [showVerseNumbers, setverseNumbers] = React.useState(true);
   const [copied, setCopied] = React.useState("Copy song lyrics");
   let verses = [];
   const clipboard = useClipboard({ timeout: 3000 });
@@ -30,10 +35,12 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
   }
   const getLyricsText = () => {
     if (!lyrics) return "";
+    const chorus = lyrics.chorus.S;
+    const addChorus = chorus ? `\n\n[chorus]\n${chorus}` : "";
     const clipboardtext = `${lyrics.title.S}\n${verses
       .map(
         (verse: string, i: number) =>
-          `[${i + 1}]\n${verse.replace("\n\n", "")} `
+          `[${i + 1}]\n${verse.replace("\n\n", "") + addChorus} `
       )
       .join("\n\n")}`;
 
@@ -62,19 +69,21 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
       }
     };
   };
+
   const handleCopy = () => {
     clipboard.copy(getLyricsText());
     track("copy_lyrics", { song: lyrics.title.S });
     setCopied("Copied!");
     setTimeout(() => setCopied("Copy song lyrics"), 3000);
   };
+  const chorus = lyrics.chorus.S;
   const EnglishTitle = (
-    <Text color="dimmed" pb="md" className="mb-6 !text-purple-600 text-center">
+    <Text color="dimmed" pb="md" className="mb-3 !text-purple-600 text-center">
       {lyrics.englishTitle.S}
     </Text>
   );
   const shareIcons = (
-    <Flex justify={"space-around"} mt="md" p="sm" gap="md">
+    <Flex justify={"space-around"} mt="sm" p="sm" gap="md">
       <Group>
         <Tooltip
           label={copied}
@@ -142,10 +151,35 @@ export default function LyricsComponent({ lyrics, ChorusComponent }: Props) {
                 {part.replace("\n\n", "")}
               </Text>
             </div>
-            {ChorusComponent()}
+
+            {chorus ? (
+              showChorus ? (
+                <ChorusComponent chorus={chorus} />
+              ) : i == 0 ? (
+                <ChorusComponent chorus={chorus} />
+              ) : null
+            ) : null}
           </Box>
         ))}
       </div>
+      {/**To work on this later */}
+      {false && (
+        <Box className="pt-4">
+          {chorus ? (
+            <Checkbox
+              label="Show chorus after every verse"
+              checked={showChorus}
+              onChange={() => setShowChorus((prev) => !prev)}
+            />
+          ) : null}
+          <Checkbox
+            label="Include verse numbers"
+            checked={showVerseNumbers}
+            onChange={() => setverseNumbers((prev) => !prev)}
+          />
+        </Box>
+      )}
+
       {shareIcons}
 
       {/* Notification when Web Share API is not available */}
