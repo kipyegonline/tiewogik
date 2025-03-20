@@ -20,6 +20,9 @@ import ChorusComponent from "./ChorusComponent";
 //import { colors } from "@/lib/Color";
 
 type Props = { lyrics: SongDataDynamo };
+const addChorus = (i: number, chorus: string) =>
+  chorus ? `\n\n[chorus ${i + 1}]\n${chorus}` : "";
+
 export default function LyricsComponent({ lyrics }: Props) {
   const [showNotification, setShowNotification] = React.useState(false);
   const [showChorus, setShowChorus] = React.useState(false);
@@ -36,11 +39,11 @@ export default function LyricsComponent({ lyrics }: Props) {
   const getLyricsText = () => {
     if (!lyrics) return "";
     const chorus = lyrics.chorus.S;
-    const addChorus = chorus ? `\n\n[chorus]\n${chorus}` : "";
+
     const clipboardtext = `${lyrics.title.S}\n${verses
       .map(
         (verse: string, i: number) =>
-          `[${i + 1}]\n${verse.replace("\n\n", "") + addChorus} `
+          `[${i + 1}]\n${verse.replace("\n\n", "") + addChorus(i, chorus)} `
       )
       .join("\n\n")}`;
 

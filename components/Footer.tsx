@@ -1,44 +1,42 @@
 import React from "react";
-import { Text, Button, Box, Textarea, Flex, Image } from "@mantine/core";
+import { Text, Button, Box, Textarea, Flex, Image, Alert } from "@mantine/core";
 import { Heart, Coffee, AlertCircle } from "lucide-react";
 import { colors } from "@/lib/Color";
 import AppModal from "./AppModal";
+import { submitForm } from "@/lib/helpers";
+
+const defaultState = { loading: false, resolved: false, rejected: false };
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const tea = ["Chebango", "Kapkatet", "Kericho Gold", "Litein", ""];
   const randTea = () => tea[Math.floor(Math.random() * tea.length)];
+  const [promise, setpromise] = React.useState(defaultState);
+
   const chosentea = React.useCallback(() => randTea(), [])();
-  //const url = `https://formsubmit.co/ajax/vinnykipx@gmail.com`;
+  const url = `https://formsubmit.co/ajax/vinnykipx@gmail.com`;
+
   const [open, setOpen] = React.useState<null | 1 | 2 | 3>(null);
-  /*
-  async function submitFormToFormSubmit(
-    formData: Record<string, string>,
-    formSubmitEndpoint: string
-  ) {
-    try {
-      const response = await fetch(formSubmitEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
 
-      if (response.ok) {
-        const result = await response.json();
+  const handleSubmission = async (payload: {
+    message: string;
+    subject: string;
+  }) => {
+    setpromise((prev) => ({ ...prev, loading: true }));
+    const response = await submitForm(
+      { ...payload, source: "tienwogik ab kalosunet" },
+      url
+    );
+    // console.log("response", response);
+    if (response)
+      setpromise((prev) => ({ ...prev, resolved: true, loading: false }));
+    else setpromise((prev) => ({ ...prev, rejected: true, loading: false }));
 
-        return result;
-      } else {
-        throw Error("something went Wrong");
-      }
-    } catch (error: unknown) {
-      console.error(error);
-      return null;
-    }
-  }
-*/
+    setTimeout(() => {
+      setpromise(defaultState);
+      setOpen(null);
+    }, 4000);
+  };
   return (
     <footer
       className="w-full p-6 !text-white mt-6 md:mt-20"
@@ -56,17 +54,29 @@ const Footer = () => {
           {" "}
           {open === 1 && (
             <LyricsIssue
-              sendvalues={(values) => console.log(values)}
-              loading={false}
+              sendvalues={handleSubmission}
+              loading={promise.loading}
             />
           )}
           {open === 2 && (
             <FeatureRequest
-              sendvalues={(values) => console.log(values)}
-              loading={false}
+              sendvalues={handleSubmission}
+              loading={promise.loading}
             />
           )}
           {open === 3 && <BuyMeTea tea={chosentea} />}
+          <Box py="md">
+            {promise.resolved && (
+              <Alert variant="light" color="green">
+                <Text>Message submitted successfully!</Text>
+              </Alert>
+            )}
+            {promise.rejected && (
+              <Alert variant="light" color="red">
+                <Text>Something went wrong, try again later.</Text>
+              </Alert>
+            )}
+          </Box>
         </Box>
       </AppModal>
       <div className="max-w-6xl mx-auto">
@@ -160,7 +170,7 @@ const LyricsIssue = ({ sendvalues, loading }: Props) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (text.trim()) {
-      sendvalues({ subject: "Issue", message: text });
+      sendvalues({ subject: "Lyrics Issue", message: text });
     }
   };
   return (

@@ -70,6 +70,11 @@ export default function HomePage() {
         }
       } else setError(result.error !== undefined ? result.error : null);
     } else {
+      if (+value > 245) {
+        setTimeout(() => setNofound(""), 3000);
+        setloading(false);
+        return setNofound("Kalenjin hymns are 245 songs only");
+      }
       const result = await getSongById(value);
 
       if (result.success) {
