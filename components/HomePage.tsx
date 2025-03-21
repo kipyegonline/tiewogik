@@ -60,9 +60,9 @@ export default function HomePage() {
     // if they duidn't enter song number
     if (Number.isNaN(Number(value))) {
       // so we have a string
-
+      alert(value);
       const result = await searchSongsByTitleAndLyrics(value);
-
+      alert(JSON.stringify(result));
       if (result?.success) {
         if (result.data !== undefined) {
           if (result?.data?.length > 1) {
