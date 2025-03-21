@@ -59,19 +59,30 @@ export default function HomePage() {
     resetValues();
     // if they duidn't enter song number
     if (Number.isNaN(Number(value))) {
+      // so we have a string
+
       const result = await searchSongsByTitleAndLyrics(value);
 
       if (result?.success) {
         if (result.data !== undefined) {
           if (result?.data?.length > 1) {
             const songs = addClickedAttr(result.data); // we map through data and add property `clicked` to false
+            console.log(songs, "valz");
             setSongs(songs);
-          } else setSong(result?.data[0]);
+          } else {
+            setSong(result?.data[0]);
+          }
         } else {
           setNofound("No songs found");
         }
-      } else setError(result.error !== undefined ? result.error : null);
+      } else {
+        setError(
+          result.error !== undefined ? result.error : "Error searching song"
+        );
+        setTimeout(() => setError(""), 4000);
+      }
     } else {
+      // we get song by id number
       if (+value > 245) {
         setTimeout(() => setNofound(""), 3000);
         setloading(false);
@@ -156,7 +167,7 @@ export default function HomePage() {
         {" "}
         <SearchComponent sendValue={handleSearch} />
       </Box>
-      <Box>songs.... {JSON.stringify(songs)}</Box>
+      <Box>songs.... {songs.length}</Box>
       <Flex
         justify={"center"}
         direction={{ base: "column", md: "row" }}
