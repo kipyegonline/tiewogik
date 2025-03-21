@@ -123,11 +123,14 @@ export default function HomePage() {
 
   const ListSongs = (
     <Box className="text-white">
-      <Text className="!text-lg py-2 font-semibold text-[#E86F36]">
-        {songs.length > 50 && (
+      {songs.length > 50 && (
+        <Text className="!text-lg py-2 font-semibold text-[#E86F36]">
+          {" "}
+          {songs.length} songs found
           <span>Also try using precise keywords to get better results</span>
-        )}
-      </Text>
+        </Text>
+      )}
+
       <List className="" p="md" size="lg" withPadding spacing={"lg"}>
         {songs.slice(first, last).map((song: SongDataDynamo & Checked) => (
           <ListItem
