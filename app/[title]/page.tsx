@@ -75,7 +75,7 @@ export default async function Page({
             <Home className="inline-block mr-2" />
             <span>Home</span>
           </Link>
-          <Link href="/" inert>
+          <Link inert href="/" className="!text-white">
             Song not found
           </Link>
         </Breadcrumbs>
@@ -93,7 +93,7 @@ export default async function Page({
             <Home className="inline-block mr-2" />
             <span>Home</span>
           </Link>
-          <Link href="/" inert>
+          <Link href="/" inert className="!text-white">
             {song?.title?.S}
           </Link>
         </Breadcrumbs>

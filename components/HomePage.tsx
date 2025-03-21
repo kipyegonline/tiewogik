@@ -43,15 +43,17 @@ export default function HomePage() {
     setNofound(null);
   };
 
-  /*const initApp = async () => {
+  const initApp = async () => {
     const randomSongId = Math.floor(Math.random() * 245);
     const result = await getSongById(randomSongId + "");
 
     if (result.success) {
       if (result.data !== undefined) setSong(result?.data);
     }
-  };*/
-  React.useEffect(() => {}, []);
+  };
+  React.useEffect(() => {
+    initApp();
+  }, []);
   const handleSearch = async (value: string) => {
     //reset everything
     resetValues();
@@ -62,7 +64,7 @@ export default function HomePage() {
       if (result?.success) {
         if (result.data !== undefined) {
           if (result?.data?.length > 1) {
-            const songs = addClickedAttr(result.data);
+            const songs = addClickedAttr(result.data); // we map through data and add property `clicked` to false
             setSongs(songs);
           } else setSong(result?.data[0]);
         } else {
@@ -86,6 +88,7 @@ export default function HomePage() {
       /*  && result.data !== undefined) setSong(result?.data);
       else setError(result.error !== undefined ? result.error : null);*/
     }
+    if (notFound) setTimeout(() => setNofound(""), 4000);
     setloading(false);
   };
   const handleClick = (song: SongDataDynamo) => {
@@ -104,6 +107,7 @@ export default function HomePage() {
   };
   const first = (current - 1) * perPage;
   const last = first + perPage;
+
   const ListSongs = (
     <Box className="text-white">
       <Text className="!text-lg py-2 font-semibold text-[#E86F36]">
