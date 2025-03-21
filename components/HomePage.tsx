@@ -60,9 +60,9 @@ export default function HomePage() {
     // if they duidn't enter song number
     if (Number.isNaN(Number(value))) {
       // so we have a string
-      alert(value);
-      const result = await searchSongsByTitleAndLyrics(value);
-      alert(JSON.stringify(result));
+
+      const result = await searchSongsByTitleAndLyrics(value.toLowerCase());
+
       if (result?.success) {
         if (result.data !== undefined) {
           if (result?.data?.length > 1) {
@@ -122,7 +122,6 @@ export default function HomePage() {
   const ListSongs = (
     <Box className="text-white">
       <Text className="!text-lg py-2 font-semibold text-[#E86F36]">
-        {songs.length} songs found.{" "}
         {songs.length > 50 && (
           <span>Also try using precise keywords to get better results</span>
         )}
