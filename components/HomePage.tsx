@@ -67,8 +67,10 @@ export default function HomePage() {
         if (result.data !== undefined) {
           if (result?.data?.length > 1) {
             const songs = addClickedAttr(result.data); // we map through data and add property `clicked` to false
-            console.log(songs, "valz");
+
             setSongs(songs);
+          } else if (result?.data?.length === 0) {
+            setNofound("Song lyrics not found,Check  keyword and try again.");
           } else {
             setSong(result?.data[0]);
           }
@@ -166,7 +168,7 @@ export default function HomePage() {
         {" "}
         <SearchComponent sendValue={handleSearch} />
       </Box>
-      <Box>songs.... {songs.length}</Box>
+
       <Flex
         justify={"center"}
         direction={{ base: "column", md: "row" }}
