@@ -156,6 +156,7 @@ export default function HomePage() {
         {" "}
         <SearchComponent sendValue={handleSearch} />
       </Box>
+      <Box>songs.... {JSON.stringify(songs)}</Box>
       <Flex
         justify={"center"}
         direction={{ base: "column", md: "row" }}
