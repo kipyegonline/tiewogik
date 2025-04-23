@@ -40,15 +40,15 @@ export interface AwsResponse<T> {
 
 // Initialize the DynamoDB client
 const client = new DynamoDBClient({
-  region: process.env.NEXT_PUBLIC_REGION,
+  region: process.env.NEXT_PUBLIC_REGION!,
   credentials: {
-    accessKeyId: process.env.NEXT_PUBLIC_ACCESS_KEY_ID as string,
-    secretAccessKey: process.env.NEXT_PUBLIC_SECRET_KEY as string,
+    accessKeyId: process.env.NEXT_PUBLIC_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.NEXT_PUBLIC_SECRET_KEY!,
   },
 });
 
 // Table name for songs
-const SONGS_TABLE = process.env.NEXT_PUBLIC_DYNAMODB_TABLE;
+const SONGS_TABLE = process.env.NEXT_PUBLIC_DYNAMODB_TABLE!;
 
 /**
  * Save a song to DynamoDB
@@ -63,7 +63,7 @@ export const saveSong = async (songData: SongDataDynamo) => {
       createdAt: { S: new Date().toISOString() },
       updatedAt: { S: new Date().toISOString() },
     };
-    console.log("AWS item", item);
+
     // Create the command to put the item in DynamoDB
     const command = new PutItemCommand({
       TableName: SONGS_TABLE,
@@ -74,7 +74,7 @@ export const saveSong = async (songData: SongDataDynamo) => {
 
     // Execute the command
     const response = await client.send(command);
-    console.log("Song saved successfully:", response);
+
     return { success: true, data: item, response };
   } catch (error: unknown) {
     if (error instanceof Error) {
