@@ -15,7 +15,6 @@ import {
 import Link from "next/link";
 
 import { Check as IconCheck, X as IconX, Home } from "lucide-react";
-import { saveSong } from "@/lib/aws";
 
 // Define form values interface
 interface FormValues {
@@ -37,7 +36,7 @@ interface NotificationState {
 const SongLyricsForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [notification, setNotification] = useState<NotificationState | null>(
-    null
+    null,
   );
   const [lyrics, setLyrics] = useState<string[]>([]);
   const [loggedin, setloggedin] = useState<boolean>(false);
@@ -86,10 +85,15 @@ const SongLyricsForm: React.FC = () => {
       chorusSearch: { S: values.chorus.toLowerCase() },
     };
     try {
-      // Send the form data to DynamoDB using our AWS library
+      // Send the form data to DynamoDB via API route
 
       setLyrics(valz);
-      const result = await saveSong(payload);
+      const res = await fetch("/api/songs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
 
       if (result.success) {
         // Show success notification

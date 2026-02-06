@@ -38,17 +38,17 @@ export interface AwsResponse<T> {
   response?: Record<string, SongDataDynamo>;
 }
 
-// Initialize the DynamoDB client
+// Initialize the DynamoDB client (server-side only — never prefix these with NEXT_PUBLIC_)
 const client = new DynamoDBClient({
-  region: process.env.NEXT_PUBLIC_REGION!,
+  region: process.env.AWS_REGION!,
   credentials: {
-    accessKeyId: process.env.NEXT_PUBLIC_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.NEXT_PUBLIC_SECRET_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
 
 // Table name for songs
-const SONGS_TABLE = process.env.NEXT_PUBLIC_DYNAMODB_TABLE!;
+const SONGS_TABLE = process.env.DYNAMODB_TABLE!;
 
 /**
  * Save a song to DynamoDB

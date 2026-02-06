@@ -11,8 +11,7 @@ import {
 } from "@mantine/core";
 import React from "react";
 import SearchComponent from "./SearchComponent";
-import { SongDataDynamo } from "@/lib/aws";
-import { getSongById, searchSongsByTitleAndLyrics } from "@/lib/aws";
+import type { SongDataDynamo, AwsResponse } from "@/lib/aws";
 import { AudioLines, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import LyricsPagination from "./Lyricspagination";
@@ -45,10 +44,14 @@ export default function HomePage() {
 
   const initApp = async () => {
     const randomSongId = Math.floor(Math.random() * 245);
-    const result = await getSongById(randomSongId + "");
-
-    if (result.success) {
-      if (result.data !== undefined) setSong(result?.data);
+    try {
+      const res = await fetch(`/api/songs/${randomSongId}`);
+      const result: AwsResponse<SongDataDynamo> = await res.json();
+      if (result.success && result.data !== undefined) {
+        setSong(result.data);
+      }
+    } catch (err) {
+      console.error("Error fetching random song:", err);
     }
   };
   React.useEffect(() => {
@@ -60,27 +63,33 @@ export default function HomePage() {
     // if they duidn't enter song number
     if (Number.isNaN(Number(value))) {
       // so we have a string
+      try {
+        const res = await fetch(
+          `/api/songs/search?q=${encodeURIComponent(value.toLowerCase())}`,
+        );
+        const result: AwsResponse<SongDataDynamo[]> = await res.json();
 
-      const result = await searchSongsByTitleAndLyrics(value.toLowerCase());
-
-      if (result?.success) {
-        if (result.data !== undefined) {
-          if (result?.data?.length > 1) {
-            const songs = addClickedAttr(result.data); // we map through data and add property `clicked` to false
-
-            setSongs(songs);
-          } else if (result?.data?.length === 0) {
-            setNofound("Song lyrics not found,Check  keyword and try again.");
+        if (result?.success) {
+          if (result.data !== undefined) {
+            if (result?.data?.length > 1) {
+              const songs = addClickedAttr(result.data);
+              setSongs(songs);
+            } else if (result?.data?.length === 0) {
+              setNofound("Song lyrics not found,Check  keyword and try again.");
+            } else {
+              setSong(result?.data[0]);
+            }
           } else {
-            setSong(result?.data[0]);
+            setNofound("No songs found");
           }
         } else {
-          setNofound("No songs found");
+          setError(
+            result.error !== undefined ? result.error : "Error searching song",
+          );
+          setTimeout(() => setError(""), 4000);
         }
-      } else {
-        setError(
-          result.error !== undefined ? result.error : "Error searching song"
-        );
+      } catch {
+        setError("Error searching song");
         setTimeout(() => setError(""), 4000);
       }
     } else {
@@ -90,13 +99,20 @@ export default function HomePage() {
         setloading(false);
         return setNofound("Kalenjin hymns are 245 songs only");
       }
-      const result = await getSongById(value);
+      try {
+        const res = await fetch(`/api/songs/${value}`);
+        const result: AwsResponse<SongDataDynamo> = await res.json();
 
-      if (result.success) {
-        if (result.data !== undefined) setSong(result?.data);
-        else setNofound("Song lyrics not found,Check  keyword and try again.");
-      } else {
-        setError(result.error !== undefined ? result.error : null);
+        if (result.success) {
+          if (result.data !== undefined) setSong(result?.data);
+          else
+            setNofound("Song lyrics not found,Check  keyword and try again.");
+        } else {
+          setError(result.error !== undefined ? result.error : null);
+        }
+      } catch {
+        setError("Error fetching song");
+        setTimeout(() => setError(""), 4000);
       }
       /*  && result.data !== undefined) setSong(result?.data);
       else setError(result.error !== undefined ? result.error : null);*/
@@ -115,7 +131,7 @@ export default function HomePage() {
           s.clicked = false;
         }
         return s;
-      })
+      }),
     );
   };
   const first = (current - 1) * perPage;
