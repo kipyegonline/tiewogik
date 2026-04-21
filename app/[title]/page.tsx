@@ -1,104 +1,126 @@
-import { getAllSongs, SongDataDynamo, getSongById } from "@/lib/aws";
-import { Breadcrumbs, Container } from "@mantine/core";
+import { getSongs, getSongDetails, Song } from "@/lib/api/songs";
+import { Breadcrumbs, Container, Title, Text, Box } from "@mantine/core";
 import PageComponent from "./page.component";
 import Link from "next/link";
 import { Home } from "lucide-react";
-import { PageProps } from "@/.next/types/app/page";
-const makeSEOExpression = (song: SongDataDynamo) => {
-  const lyrics = eval(song.lyrics.S).join(" ");
-  return {
-    title: `${song.id.N} ${song.title.S} | Tienwogik che kilosune Jehovah | Tienwogik ab Kalosunet|  Kalenjin Hymn song `,
-    description: `Kalenjin hymn song ${song.id.N} ${song.title.S} | Tienwogik che kilosune Jehovah | Tienwogik ab Kalosunet | ${lyrics} ${song?.chorus?.S}`,
-    openGraph: {
-      images: [],
-    },
-  };
-};
+
+interface PageProps {
+  params: Promise<{ title: string }>;
+}
+
 const extractSongId = (url: string) => {
-  const idString: string[] = url.split("-");
-  return idString[idString.length - 1];
+  const parts = url.split("-");
+  return parts[parts.length - 1];
 };
-// Return a list of `params` to populate the [slug] dynamic segment
+
+const slugify = (text: string) => {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim();
+};
+
+/**
+ * SEO METADATA GENERATION
+ */
+export async function generateMetadata({ params }: PageProps) {
+  const { title: slug } = await params;
+  const id = extractSongId(slug);
+  
+  if (!id || isNaN(Number(id))) return { title: "Song Not Found" };
+
+  const result = await getSongDetails(Number(id));
+  if (result.success && result.song) {
+    const song = result.song;
+    
+    // Concatenate all song components for a rich SEO description
+    const versesText = song.verses?.map((v: any) => v.content).join(" ") || "";
+    const englishTitle = song.english_title ? `(${song.english_title})` : "";
+    const chorusText = song.chorus ? `Chorus: ${song.chorus}` : "";
+    
+    const fullDescription = `${song.song_number}. ${song.title} ${englishTitle} ${chorusText} ${versesText}`
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 250);
+    
+    return {
+      title: `${song.song_number}. ${song.title} | Tienwogik ab Kalosunet`,
+      description: fullDescription + (fullDescription.length >= 250 ? "..." : ""),
+      openGraph: {
+        title: `${song.song_number}. ${song.title} - Kalenjin Hymn`,
+        description: fullDescription,
+      },
+    };
+  }
+
+  return { title: "Tienwogik Song" };
+}
+
+/**
+ * STATIC ROUTE GENERATION (SSG)
+ */
 export async function generateStaticParams() {
-  const response = await getAllSongs();
-  if (response.success && response.data !== undefined) {
-    return response.data.map((post: SongDataDynamo) => ({
-      id: post.title.S.toLowerCase().split(" ").join("-") + "-" + post.id.N,
-    }));
+  try {
+    const response = await getSongs();
+    if (response.success && Array.isArray(response.data)) {
+      return response.data.map((song: Song) => ({
+        title: `${slugify(song.title)}-${song.id}`,
+      }));
+    }
+  } catch (error) {
+    console.error("Error generating static params:", error);
   }
   return [];
 }
-/*Promise<{ title: string; description: string; openGraph: { images: { url: string }[] } }>*/
 
-// Return the dynamic route params to render this page
+/**
+ * SERVER PAGE COMPONENT
+ */
+export default async function Page({ params }: PageProps) {
+  const { title: slug } = await params;
+  const id = extractSongId(slug);
 
-export async function generateMetadata({ params }: PageProps) {
-  const ps = await params;
-  let id!: string;
-  if ("title" in ps) id = extractSongId(ps.title);
-  else id = "0";
-
-  const song = await getSongById(id);
-
-  if (song.success && song.data !== undefined) {
-    return makeSEOExpression(song.data);
-  } else {
-    return {
-      title: ` Kalenjin Hymn song ${ps?.title?.slice(
-        1,
-        -1
-      )} } |   Tienwogik che kilosune Jehovah | Tienwogik ab Kalosunet `,
-      description: `Lyrics for Kalenjin hymn song,   | Tienwogik che kilosune Jehovah | Tienwogik ab Kalosunet   ${ps?.title?.slice(
-        1,
-        -1
-      )}`,
-    };
+  if (!id || isNaN(Number(id))) {
+    return <NotFoundView />;
   }
+
+  const result = await getSongDetails(Number(id));
+  
+  if (!result.success || !result.song) {
+    return <NotFoundView />;
+  }
+
+  const song = result.song;
+
+  return (
+    <Container p="lg" size="lg" className="min-h-screen">
+      <Box mb="xl">
+        <Breadcrumbs>
+          <Link href="/" className="text-[#E86F36] flex items-center hover:underline">
+            <Home size={18} className="mr-2" />
+            <Text fw={500}>Home</Text>
+          </Link>
+          <Text c="dimmed" fw={500}>
+            {song.title}
+          </Text>
+        </Breadcrumbs>
+      </Box>
+
+      <PageComponent song={song} />
+    </Container>
+  );
 }
 
-// Multiple versions of this page will be statically generated
-// using the `params` returned by `generateStaticParams`
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ title: string }>;
-}) {
-  // ...
-  let song: null | SongDataDynamo = null;
-  const { title } = await params;
-  const id = extractSongId(title);
-  if (Number.isNaN(Number(id)))
-    return (
-      <Container p="lg" size={"lg"}>
-        <Breadcrumbs>
-          <Link href="/" className="text-blue-500 flex items-center">
-            <Home className="inline-block mr-2" />
-            <span>Home</span>
-          </Link>
-          <Link inert href="/" className="!text-white">
-            Song not found
-          </Link>
-        </Breadcrumbs>
-      </Container>
-    );
-  const response = await getSongById(id);
-  if (response.success && response.data !== undefined) {
-    song = response.data;
-  }
-  if (song)
-    return (
-      <Container p="lg" size={"lg"}>
-        <Breadcrumbs>
-          <Link href="/" className="text-blue-500 flex items-center">
-            <Home className="inline-block mr-2" />
-            <span>Home</span>
-          </Link>
-          <Link href="/" inert className="!text-white">
-            {song?.title?.S}
-          </Link>
-        </Breadcrumbs>
-        <PageComponent song={song} />
-      </Container>
-    );
-  return null;
+function NotFoundView() {
+  return (
+    <Container p="xl" size="sm" className="text-center py-20">
+      <Title order={2} mb="md" c="white">Song Not Found</Title>
+      <Text c="dimmed" mb="xl">We couldn't find the hymn you were looking for.</Text>
+      <Link href="/" className="px-6 py-2 bg-[#E86F36] text-white rounded-full font-bold">
+        Back to Home
+      </Link>
+    </Container>
+  );
 }

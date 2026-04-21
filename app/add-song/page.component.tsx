@@ -11,20 +11,22 @@ import {
   Select,
   Notification,
   Breadcrumbs,
+  ActionIcon,
+  Stack,
+  Text,
 } from "@mantine/core";
 import Link from "next/link";
 
-import { Check as IconCheck, X as IconX, Home } from "lucide-react";
+import { Check as IconCheck, X as IconX, Home, Plus, Trash2 } from "lucide-react";
+import { addSong } from "@/lib/api/songs";
 
 // Define form values interface
 interface FormValues {
-  id: string;
+  songNumber: string;
   title: string;
   englishTitle: string;
-  lyrics: string;
+  verses: { content: string }[];
   chorus: string;
-  language?: string;
-  genre?: string;
 }
 
 // Define notification state interface
@@ -38,31 +40,29 @@ const SongLyricsForm: React.FC = () => {
   const [notification, setNotification] = useState<NotificationState | null>(
     null,
   );
-  const [lyrics, setLyrics] = useState<string[]>([]);
   const [loggedin, setloggedin] = useState<boolean>(false);
 
   // Define the form with validation
   const form = useForm<FormValues>({
     initialValues: {
-      id: "",
+      songNumber: "",
       title: "",
       englishTitle: "",
-      lyrics: "",
+      verses: [{ content: "" }], // Initialize with one empty verse object
       chorus: "",
-      // language: "",
-      //genre: "",
     },
     validate: {
-      id: (value: string) =>
-        value.trim().length > 0 ? null : "ID is required",
-      title: (value: string) =>
-        value.trim().length > 0 ? null : "Title is required",
-      lyrics: (value: string) =>
-        value.trim().length > 0 ? null : "Lyrics are required",
-      /* chorus: (value: string) =>
-        value.trim().length > 0 ? null : "Chorus is required",*/
+      songNumber: (value) => (value.trim().length > 0 ? null : "Song Number is required"),
+      title: (value) => (value.trim().length > 0 ? null : "Title is required"),
+      verses: {
+        content: (value: string) => {
+          console.log(value, 'value')
+          return value.length > 1 ? null : "Verse content is required"
+        },
+      },
     },
   });
+
   React.useEffect(() => {
     const password = prompt("Enter OTP");
     if (password === "tiendo") setloggedin(true);
@@ -72,60 +72,45 @@ const SongLyricsForm: React.FC = () => {
   const handleSubmit = async (values: FormValues): Promise<void> => {
     setIsSubmitting(true);
     setNotification(null);
-    const valz = values.lyrics.slice().split("br");
 
     const payload = {
-      id: { N: values.id },
-      title: { S: values.title },
-      englishTitle: { S: values.englishTitle },
-      chorus: { S: values.chorus },
-      lyrics: { S: JSON.stringify(valz) },
-      titleSearch: { S: values.title.toLowerCase() },
-      lyricsSearch: { S: values.lyrics.toLowerCase() },
-      chorusSearch: { S: values.chorus.toLowerCase() },
+      song_number: parseInt(values.songNumber),
+      title: values.title,
+      english_title: values.englishTitle,
+      chorus: values.chorus,
+      verses: values.verses
+        .map(v => v.content)
+        .filter(v => v.trim() !== ""), // Map objects back to strings for the API
     };
-    try {
-      // Send the form data to DynamoDB via API route
 
-      setLyrics(valz);
-      const res = await fetch("/api/songs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const result = await res.json();
+    try {
+      const result = await addSong(payload);
 
       if (result.success) {
-        // Show success notification
         setNotification({
           type: "success",
-          message: "Song saved successfully to the database!",
+          message: "Song saved successfully!",
         });
-        setLyrics([]);
-        // Reset the form after successful submission
         form.reset();
       } else {
-        // Show error notification
         setNotification({
           type: "error",
           message: result.error || "Failed to save song. Please try again.",
         });
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        // Handle any unexpected errors
-        setNotification({
-          type: "error",
-          message:
-            error.message || "An unexpected error occurred. Please try again.",
-        });
-      }
+    } catch (error: any) {
+      setNotification({
+        type: "error",
+        message: error.message || "An unexpected error occurred.",
+      });
     } finally {
       setTimeout(() => setNotification(null), 3000);
       setIsSubmitting(false);
     }
   };
+
   if (!loggedin) return null;
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
       <Breadcrumbs py="md">
@@ -133,93 +118,84 @@ const SongLyricsForm: React.FC = () => {
           <Home className="inline-block mr-2" />
           <span>Home</span>
         </Link>
-        <Link href="/" inert>
+        <Link href="/add-song" className="text-gray-500">
           Add song
         </Link>
       </Breadcrumbs>
-      <Paper shadow="md" p="lg" className="w-full max-w-3xl bg-white">
-        <Title order={2} className="text-center mb-6 text-gray-800">
-          Song Lyrics Submission
+
+      <Paper shadow="md" p="xl" className="w-full max-w-3xl bg-white rounded-xl">
+        <Title order={2} className="text-center mb-8 text-gray-800 font-bold">
+          Submit New Song
         </Title>
 
         <form onSubmit={form.onSubmit(handleSubmit)}>
-          <div className="space-y-4">
-            {/* Song ID */}
-            <TextInput
-              required
-              label="Song ID"
-              placeholder="Enter a unique identifier"
-              className="w-full"
-              {...form.getInputProps("id")}
-            />
-            {/* Title */}
-            <TextInput
-              required
-              label="Title"
-              placeholder="Enter the song title"
-              className="w-full"
-              {...form.getInputProps("title")}
-            />
-            {/* English Title */}
+          <Stack gap="md">
+            <Group grow>
+              <TextInput
+                required
+                label="Song Number"
+                placeholder="e.g. 101"
+                {...form.getInputProps("songNumber")}
+              />
+              <TextInput
+                required
+                label="Kalenjin Title"
+                placeholder="Enter title"
+                {...form.getInputProps("title")}
+              />
+            </Group>
+
             <TextInput
               label="English Title"
-              placeholder="Enter the English translation of the title (if applicable)"
-              className="w-full"
+              placeholder="Enter translation (Optional)"
               {...form.getInputProps("englishTitle")}
             />
-            {false && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Additional fields */}
-                <Select
-                  label="Language"
-                  placeholder="Select the language"
-                  data={[
-                    { value: "english", label: "English" },
-                    { value: "spanish", label: "Spanish" },
-                    { value: "french", label: "French" },
-                    { value: "other", label: "Other" },
-                  ]}
-                  {...form.getInputProps("language")}
-                />
 
-                <Select
-                  label="Genre"
-                  placeholder="Select the genre"
-                  data={[
-                    { value: "pop", label: "Pop" },
-                    { value: "rock", label: "Rock" },
-                    { value: "hiphop", label: "Hip Hop" },
-                    { value: "rnb", label: "R&B" },
-                    { value: "country", label: "Country" },
-                    { value: "other", label: "Other" },
-                  ]}
-                  {...form.getInputProps("genre")}
-                />
-              </div>
-            )}
-            {/* Chorus */}
+
+
+            <div className="mt-4">
+              <Text fw={500} size="sm" mb={4}>Verses</Text>
+              <Stack gap="sm">
+                {form.values.verses.map((_, index) => (
+                  <Group key={index} align="flex-start">
+                    <Textarea
+                      required
+                      placeholder={`Verse ${index + 1}`}
+                      className="flex-1"
+                      minRows={2}
+                      {...form.getInputProps(`verses.${index}.content`)}
+                    />
+                    <ActionIcon
+                      color="red"
+                      variant="light"
+                      mt={4}
+                      onClick={() => form.removeListItem("verses", index)}
+                      disabled={form.values.verses.length === 1}
+                    >
+                      <Trash2 size="1.1rem" />
+                    </ActionIcon>
+                  </Group>
+                ))}
+              </Stack>
+
+              <Button
+                leftSection={<Plus size={16} />}
+                variant="light"
+                color="blue"
+                mt="md"
+                onClick={() => form.insertListItem("verses", { content: "" })}
+              >
+                Add Verse
+              </Button>
+            </div>
             <Textarea
               label="Chorus"
-              placeholder="Enter the chorus of the song"
+              placeholder="Enter the chorus"
               minRows={3}
-              rows={5}
-              className="w-full"
               {...form.getInputProps("chorus")}
             />
+          </Stack>
 
-            <pre>{lyrics}</pre>
-            {/* Lyrics */}
-            <Textarea
-              required
-              label="Lyrics"
-              placeholder="Enter the complete lyrics of the song"
-              minRows={8}
-              cols={50}
-              rows={10}
-              className="w-full"
-              {...form.getInputProps("lyrics")}
-            />
-          </div>
           {notification && (
             <Notification
               icon={
@@ -231,23 +207,24 @@ const SongLyricsForm: React.FC = () => {
               }
               color={notification.type === "success" ? "teal" : "red"}
               title={notification.type === "success" ? "Success" : "Error"}
-              className="mb-4"
+              mt="xl"
               onClose={() => setNotification(null)}
             >
               {notification.message}
             </Notification>
           )}
 
-          <Group mt="xl">
+          <Group justify="flex-end" mt="xl">
             <Button
               type="button"
-              variant="outline"
+              variant="subtle"
+              color="gray"
               onClick={() => form.reset()}
               disabled={isSubmitting}
             >
               Reset
             </Button>
-            <Button type="submit" color="orange" loading={isSubmitting}>
+            <Button type="submit" color="orange" size="md" loading={isSubmitting}>
               Save to Database
             </Button>
           </Group>
@@ -258,3 +235,4 @@ const SongLyricsForm: React.FC = () => {
 };
 
 export default SongLyricsForm;
+
