@@ -8,7 +8,6 @@ import {
   Title,
   Paper,
   Group,
-  Select,
   Notification,
   Breadcrumbs,
   ActionIcon,
@@ -98,10 +97,10 @@ const SongLyricsForm: React.FC = () => {
           message: result.error || "Failed to save song. Please try again.",
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       setNotification({
         type: "error",
-        message: error.message || "An unexpected error occurred.",
+        message: error instanceof Error ? error.message : "An unexpected error occurred.",
       });
     } finally {
       setTimeout(() => setNotification(null), 3000);

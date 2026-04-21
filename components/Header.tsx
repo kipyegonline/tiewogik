@@ -25,7 +25,7 @@ const Header = () => {
 
     // Update last scroll position
     setLastScrollPosition(currentScrollPosition);
-  }, [scroll.y]);
+  }, [scroll.y, lastScrollPosition]);
 
   return (
     <header

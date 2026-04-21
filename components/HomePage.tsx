@@ -1,23 +1,13 @@
 "use client";
-import { Box, List, ListItem, Center, Alert, Flex, Text, ActionIcon, Group, UnstyledButton, ScrollArea, Tooltip, rem, Loader } from "@mantine/core";
+import { Box, Center, Alert, Text, ActionIcon, Group, UnstyledButton, ScrollArea, Loader } from "@mantine/core";
 import React from "react";
 import SearchComponent from "./SearchComponent";
-import { AudioLines, ExternalLink, Music, ChevronLeft, LayoutGrid, List as ListIcon, X } from "lucide-react";
-import Link from "next/link";
+import { AudioLines, Music, ChevronLeft } from "lucide-react";
 import LyricsPagination from "./Lyricspagination";
 import LyricsComponent from "./LyricsComponent";
 import MusicParticles from "./MusicParticles";
-import { searchSongs, getRandomSong, getSongDetails, getSongs } from "@/lib/api/songs";
+import { searchSongs, getSongDetails, getSongs, Song } from "@/lib/api/songs";
 
-export interface Song {
-  id: number;
-  song_number: number;
-  title: string;
-  english_title: string;
-  chorus: string;
-  verses?: { content: string, verse_order: number }[];
-  clicked?: boolean;
-}
 
 type ViewMode = "BROWSE" | "DETAIL";
 
@@ -53,7 +43,7 @@ export default function HomePage() {
       } else {
         setError(result.error);
       }
-    } catch (err) {
+    } catch {
       setError("Failed to connect to server");
     } finally {
       setloading(false);
@@ -97,7 +87,7 @@ export default function HomePage() {
       } else {
         setError(result.error);
       }
-    } catch (err) {
+    } catch {
       setError("Search failed. Please try again.");
     } finally {
       setloading(false);
@@ -132,7 +122,7 @@ export default function HomePage() {
         // Update selection in list if needed
         setAllSongs(prev => prev.map(s => ({ ...s, clicked: s.id === clickedSong.id })));
       }
-    } catch (err) {
+    } catch {
       setError("Failed to load song details");
     } finally {
       setloading(false);

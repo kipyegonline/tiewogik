@@ -6,14 +6,14 @@ import AppModal from "./AppModal";
 import { submitForm } from "@/lib/helpers";
 
 const defaultState = { loading: false, resolved: false, rejected: false };
+const TEA_VARIANTS = ["Chebango", "Kapkatet", "Kericho Gold", "Litein", ""];
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const tea = ["Chebango", "Kapkatet", "Kericho Gold", "Litein", ""];
-  const randTea = () => tea[Math.floor(Math.random() * tea.length)];
+  const randTea = React.useCallback(() => TEA_VARIANTS[Math.floor(Math.random() * TEA_VARIANTS.length)], []);
   const [promise, setpromise] = React.useState(defaultState);
 
-  const chosentea = React.useCallback(() => randTea(), [])();
+  const chosentea = React.useCallback(() => randTea(), [randTea])();
   const url = `https://formsubmit.co/ajax/vinnykipx@gmail.com`;
 
   const [open, setOpen] = React.useState<null | 1 | 2 | 3>(null);

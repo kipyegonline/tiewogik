@@ -1,4 +1,4 @@
-import { getSongs, getSongDetails, Song } from "@/lib/api/songs";
+import { getSongs, getSongDetails, Song, Verse } from "@/lib/api/songs";
 import { Breadcrumbs, Container, Title, Text, Box } from "@mantine/core";
 import PageComponent from "./page.component";
 import Link from "next/link";
@@ -28,23 +28,23 @@ const slugify = (text: string) => {
 export async function generateMetadata({ params }: PageProps) {
   const { title: slug } = await params;
   const id = extractSongId(slug);
-  
+
   if (!id || isNaN(Number(id))) return { title: "Song Not Found" };
 
   const result = await getSongDetails(Number(id));
   if (result.success && result.song) {
     const song = result.song;
-    
+
     // Concatenate all song components for a rich SEO description
-    const versesText = song.verses?.map((v: any) => v.content).join(" ") || "";
+    const versesText = song.verses?.map((v: Verse) => v.content).join(" ") || "";
     const englishTitle = song.english_title ? `(${song.english_title})` : "";
     const chorusText = song.chorus ? `Chorus: ${song.chorus}` : "";
-    
+
     const fullDescription = `${song.song_number}. ${song.title} ${englishTitle} ${chorusText} ${versesText}`
       .replace(/\s+/g, " ")
       .trim()
       .slice(0, 250);
-    
+
     return {
       title: `${song.song_number}. ${song.title} | Tienwogik ab Kalosunet`,
       description: fullDescription + (fullDescription.length >= 250 ? "..." : ""),
@@ -87,7 +87,7 @@ export default async function Page({ params }: PageProps) {
   }
 
   const result = await getSongDetails(Number(id));
-  
+
   if (!result.success || !result.song) {
     return <NotFoundView />;
   }

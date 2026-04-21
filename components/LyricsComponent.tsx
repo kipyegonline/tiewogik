@@ -8,19 +8,18 @@ import {
   Group,
   Transition,
   Notification,
-  Flex,
-  Tooltip,
+  Tooltip, Flex,
   Checkbox,
 } from "@mantine/core";
 import { useClipboard } from "@mantine/hooks";
 import { Copy, Share2 as Share, Check } from "lucide-react";
 import { track } from "@vercel/analytics";
 import ChorusComponent from "./ChorusComponent";
-import { Song } from "./HomePage";
+import { Song, Verse } from "@/lib/api/songs";
 
 type Props = { song: Song };
 
-const addChorus = (i: number, chorus: string) =>
+const addChorus = (i: number, chorus: string | null) =>
   chorus ? `\n\n[Chorus]\n${chorus}` : "";
 
 export default function LyricsComponent({ song }: Props) {
@@ -129,11 +128,31 @@ export default function LyricsComponent({ song }: Props) {
       </Title>
 
       {song.english_title && EnglishTitle}
+
+      <Group justify="center" gap="xl" mb="md" className="border-b border-gray-100 pb-4">
+        <Checkbox
+          label="Repeat Chorus"
+          checked={showChorus}
+          onChange={(e) => setShowChorus(e.currentTarget.checked)}
+          color="orange"
+          size="xs"
+        />
+        <Checkbox
+          label="Verse Numbers"
+          checked={showVerseNumbers}
+          onChange={(e) => setverseNumbers(e.currentTarget.checked)}
+          color="orange"
+          size="xs"
+        />
+      </Group>
+
       {shareIcons}
       <div className="lyrics-container rounded-lg p-2 md:p-4 space-y-4 min-w-full md:min-w-[400px] border-2 border-gray-100">
-        {verses.map((v, i: number) => (
+        {verses.map((v: Verse, i: number) => (
           <Box key={i} className=" px-2 md:px-4 ">
-            <small className="text-gray-400  ">[{i + 1}]</small>
+            {showVerseNumbers && (
+              <small className="text-gray-400">[{i + 1}]</small>
+            )}
             <div>
               <Text
                 component="pre"
